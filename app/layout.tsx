@@ -12,8 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="font-segoe antialiased">
+    <html lang="en" suppressHydrationWarning className="win11-cursor">
+      <body className="min-h-screen font-segoe antialiased bg-windows11-wallpaper bg-cover bg-center">
         {children}
       </body>
     </html>

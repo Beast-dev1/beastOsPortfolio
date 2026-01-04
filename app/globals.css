@@ -12,15 +12,70 @@
 
 body {
   color: var(--foreground);
-  background: var(--background);
   font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Windows 11 Default Wallpaper */
+.bg-windows11-wallpaper {
+  background-image: url('/windows11-wallpaper.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  /* Fallback gradient if image fails to load */
+  background-color: #1e3a8a;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Windows 11 Cursor Styles */
+  .win11-cursor {
+    cursor: url('/cursor/cursor-svgrepo-com.svg') 0 0, auto;
+  }
+
+  .win11-cursor * {
+    cursor: inherit;
+  }
+
+  .win11-pointer {
+    cursor: url('/cursor/hand-pointer-svgrepo-com.svg') 0 0, pointer;
+  }
+
+  .win11-hand {
+    cursor: url('/cursor/hand-pointer-svgrepo-com.svg') 0 0, pointer;
+  }
+}
+
+/* Scrollbar styling for Windows 11 aesthetic */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+  background-clip: padding-box;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
 }
 
