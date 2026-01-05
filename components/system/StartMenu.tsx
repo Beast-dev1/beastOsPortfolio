@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useWindowContext } from '@/Context/windowContext';
 import { appConfig } from '@/config/apps';
+import Terminal from './Terminal';
 
 interface StartMenuProps {
   isOpen: boolean;
@@ -65,19 +66,24 @@ export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
     const existingWindow = windows.find(w => w.id === appId);
     
     if (!existingWindow) {
-      // Add window with placeholder content
-      addWindow(
-        appId,
-        <div className="p-4 flex items-center justify-center h-full">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">{appName}</h2>
-            <p className="text-sm text-gray-500">App component coming soon</p>
-          </div>
-        </div>,
-        800,
-        600,
-        appIcon
-      );
+      // Handle specific apps
+      if (appId === 'Terminal') {
+        addWindow(appId, <Terminal />, 800, 500, appIcon);
+      } else {
+        // Default placeholder for other apps
+        addWindow(
+          appId,
+          <div className="p-4 flex items-center justify-center h-full">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold mb-2">{appName}</h2>
+              <p className="text-sm text-gray-500">App component coming soon</p>
+            </div>
+          </div>,
+          800,
+          600,
+          appIcon
+        );
+      }
     }
     
     onClose();

@@ -14,6 +14,7 @@ import {
 import { useWindowContext } from '@/Context/windowContext';
 import { appConfig } from '@/config/apps';
 import StartMenu from './StartMenu';
+import Terminal from './Terminal';
 
 export default function Taskbar() {
   const { windows, addWindow, restoreWindow, setWindowState, bringToFront } = useWindowContext();
@@ -75,9 +76,13 @@ export default function Taskbar() {
       const app = appConfig.taskbarApps.find((app) => app.id === appId);
       const appIcon = app?.icon || '';
       
-      // Add window logic - will be handled by individual app components
-      // For now, we'll just add a placeholder that can be replaced later
-      // TODO: Replace with actual app components (FileExplorer, Mail, Music, etc.)
+      // Handle specific apps
+      if (appId === 'Terminal') {
+        addWindow(appId, <Terminal />, 800, 500, appIcon);
+        return;
+      }
+      
+      // Default placeholder for other apps
       addWindow(
         appId,
         <div className="p-4 flex items-center justify-center h-full">
