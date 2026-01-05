@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useWindowContext } from '@/Context/windowContext';
 import { appConfig } from '@/config/apps';
+import StartMenu from './StartMenu';
 
 export default function Taskbar() {
   const { windows, addWindow, restoreWindow, setWindowState, bringToFront } = useWindowContext();
@@ -233,24 +234,8 @@ export default function Taskbar() {
         </div>
       </motion.div>
 
-      {/* Start Menu (Placeholder - will be implemented in Phase 5) */}
-      <AnimatePresence>
-        {isStartMenuOpen && (
-          <motion.div
-            className="start-menu fixed bottom-16 left-4 w-96 h-[600px] rounded-2xl backdrop-blur-xl bg-[rgba(255,255,255,0.95)] dark:bg-[rgba(30,30,30,0.95)] border border-[rgba(255,255,255,0.18)] dark:border-[rgba(255,255,255,0.1)] shadow-[0_8px_32px_rgba(0,0,0,0.2)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] z-[10000]"
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="p-4">
-              <p className="text-sm text-[#666666] dark:text-[#aaaaaa]">
-                Start Menu (Phase 5)
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Start Menu */}
+      <StartMenu isOpen={isStartMenuOpen} onClose={() => setIsStartMenuOpen(false)} />
     </div>
   );
 }
