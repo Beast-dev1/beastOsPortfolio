@@ -21,6 +21,7 @@ import {
 import { useWindowContext } from '@/Context/windowContext';
 import { appConfig } from '@/config/apps';
 import Terminal from './Terminal';
+import FileExplorer from './FileExplorer';
 
 interface StartMenuProps {
   isOpen: boolean;
@@ -69,6 +70,8 @@ export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
       // Handle specific apps
       if (appId === 'Terminal') {
         addWindow(appId, <Terminal />, 800, 500, appIcon);
+      } else if (appId === 'FileExplorer') {
+        addWindow(appId, <FileExplorer />, 1000, 700, appIcon);
       } else {
         // Default placeholder for other apps
         addWindow(

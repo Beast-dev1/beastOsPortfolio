@@ -15,6 +15,7 @@ import { useWindowContext } from '@/Context/windowContext';
 import { appConfig } from '@/config/apps';
 import StartMenu from './StartMenu';
 import Terminal from './Terminal';
+import FileExplorer from './FileExplorer';
 
 export default function Taskbar() {
   const { windows, addWindow, restoreWindow, setWindowState, bringToFront } = useWindowContext();
@@ -79,6 +80,11 @@ export default function Taskbar() {
       // Handle specific apps
       if (appId === 'Terminal') {
         addWindow(appId, <Terminal />, 800, 500, appIcon);
+        return;
+      }
+      
+      if (appId === 'FileExplorer') {
+        addWindow(appId, <FileExplorer />, 1000, 700, appIcon);
         return;
       }
       

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 
 import Windows11Window from '@/components/system/Windows11Window';
+import DesktopIcons from '@/components/system/DesktopIcons';
 import { useWindowContext } from '@/Context/windowContext';
 
 export default function Desktop() {
@@ -22,6 +23,7 @@ export default function Desktop() {
 
   return (
     <>
+      <DesktopIcons />
       {windows.map((window) => (
         <Windows11Window
           key={window.id}
