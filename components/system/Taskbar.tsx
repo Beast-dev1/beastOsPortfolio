@@ -6,11 +6,11 @@ import Image from 'next/image';
 import { 
   Wifi, 
   Volume2, 
-  Battery, 
   ChevronUp,
   Search,
   CloudSun
 } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useWindowContext } from '@/Context/windowContext';
 import { appConfig } from '@/config/apps';
 import StartMenu from './StartMenu';
@@ -143,12 +143,12 @@ export default function Taskbar() {
             aria-label="Start Menu"
           >
             {/* Windows 11 Logo - Four squares */}
-            <div className="grid grid-cols-2 gap-[1px] w-6 h-6">
-              <div className="w-3 h-3 bg-[#0078D4] rounded-tl-[2px]" />
-              <div className="w-3 h-3 bg-[#0078D4] rounded-tr-[2px]" />
-              <div className="w-3 h-3 bg-[#0078D4] rounded-bl-[2px]" />
-              <div className="w-3 h-3 bg-[#0078D4] rounded-br-[2px]" />
-            </div>
+            <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="9" height="9" rx="0.5" fill="#0078D4"/>
+              <rect x="13" y="2" width="9" height="9" rx="0.5" fill="#0078D4"/>
+              <rect x="2" y="13" width="9" height="9" rx="0.5" fill="#0078D4"/>
+              <rect x="13" y="13" width="9" height="9" rx="0.5" fill="#0078D4"/>
+            </svg>
           </button>
 
           {/* Search Bar */}
@@ -209,24 +209,24 @@ export default function Taskbar() {
         {/* Right Side - System Tray */}
         <div className="flex items-center h-full gap-0 pr-0">
           {/* System Icons */}
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-0">
             <button
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
               aria-label="WiFi"
             >
-              <Wifi className="w-4 h-4 text-white" />
+              <Wifi className="w-4 h-5 text-white" />
             </button>
             <button
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
               aria-label="Volume"
             >
-              <Volume2 className="w-4 h-4 text-white" />
+              <Volume2 className="w-4 h-5 text-white" />
             </button>
             <button
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
               aria-label="Battery"
             >
-              <Battery className="w-4 h-4 text-white" />
+              <Icon icon="gg:battery" className="w-4 h-6 text-white" />
             </button>
           </div>
 

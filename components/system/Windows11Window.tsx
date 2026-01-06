@@ -152,12 +152,12 @@ export default function Windows11Window({
       disableDragging={isMobile}
       enableResizing={!isMobile}
       onDragStart={() => setIsDragging(true)}
-      onDragStop={(e, d) => {
+      onDragStop={(_e: any, d: any) => {
         setIsDragging(false);
         setWindowState(id, { x: d.x, y: d.y });
       }}
       onMouseDown={() => bringToFront(id)}
-      onResizeStop={(e, direction, ref, delta, position) => {
+      onResizeStop={(_e: any, _direction: any, ref: any, _delta: any, position: any) => {
         setWindowState(id, {
           width: ref.style.width,
           height: ref.style.height,
