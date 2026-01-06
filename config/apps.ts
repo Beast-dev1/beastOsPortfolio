@@ -7,6 +7,7 @@ export const appConfig = {
     { name: 'Music', icon: '/cursor/music.svg', id: 'Music' },
     { name: 'Photos', icon: '/cursor/photos.svg', id: 'Photos' },
     { name: 'Terminal', icon: '/cursor/terminal-svgrepo-com (1).svg', id: 'Terminal' },
+    { name: 'Google Chrome', icon: '/cursor/chrome.svg', id: 'GoogleChrome' },
     { name: 'About Me', icon: '/cursor/about.svg', id: 'aboutMe' },
   ],
   pinnedApps: [
