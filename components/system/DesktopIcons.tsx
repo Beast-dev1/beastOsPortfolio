@@ -8,6 +8,7 @@ import { useFileSystem } from '@/Context/FileSystemContext';
 import { appConfig } from '@/config/apps';
 import Terminal from './Terminal';
 import FileExplorer from './FileExplorer';
+import Chrome from './Chrome';
 
 export default function DesktopIcons() {
   const { 
@@ -93,6 +94,11 @@ export default function DesktopIcons() {
 
         if (appId === 'FileExplorer') {
           addWindow(appId, <FileExplorer />, 1000, 700, appIcon);
+          return;
+        }
+
+        if (appId === 'GoogleChrome') {
+          addWindow(appId, <Chrome />, 1200, 800, appIcon);
           return;
         }
 

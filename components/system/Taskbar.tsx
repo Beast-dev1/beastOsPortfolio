@@ -16,6 +16,7 @@ import { appConfig } from '@/config/apps';
 import StartMenu from './StartMenu';
 import Terminal from './Terminal';
 import FileExplorer from './FileExplorer';
+import Chrome from './Chrome';
 
 export default function Taskbar() {
   const { windows, addWindow, restoreWindow, setWindowState, bringToFront } = useWindowContext();
@@ -85,6 +86,11 @@ export default function Taskbar() {
       
       if (appId === 'FileExplorer') {
         addWindow(appId, <FileExplorer />, 1000, 700, appIcon);
+        return;
+      }
+      
+      if (appId === 'GoogleChrome') {
+        addWindow(appId, <Chrome />, 1200, 800, appIcon);
         return;
       }
       
