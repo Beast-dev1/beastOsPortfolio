@@ -148,9 +148,10 @@ export default function Windows11Window({
       }
       style={{
         zIndex: safeZIndex,
+        pointerEvents: 'auto',
       }}
-      disableDragging={isMobile}
-      enableResizing={!isMobile}
+      disableDragging={isMobile || win.isMaximized}
+      enableResizing={!isMobile && !win.isMaximized}
       onDragStart={() => setIsDragging(true)}
       onDragStop={(_e: any, d: any) => {
         setIsDragging(false);

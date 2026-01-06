@@ -10,33 +10,62 @@ import Terminal from './Terminal';
 import FileExplorer from './FileExplorer';
 
 export default function DesktopIcons() {
-  const { desktopIcons, getPositionForIcon, saveIconPosition } = useDesktopIcons();
+  const { 
+    desktopIcons, 
+    getPositionForIcon, 
+    saveIconPosition,
+    findNearestAvailablePosition,
+    snapToGrid,
+  } = useDesktopIcons();
   const { addWindow, windows, restoreWindow, setWindowState, bringToFront } = useWindowContext();
   const { setCurrentDirectory } = useFileSystem();
   const [selectedIconId, setSelectedIconId] = useState<string | null>(null);
   const [iconPositions, setIconPositions] = useState<Map<string, { x: number; y: number }>>(new Map());
 
-  // Initialize icon positions
+  // Initialize icon positions with collision detection
   useEffect(() => {
     const positions = new Map<string, { x: number; y: number }>();
     desktopIcons.forEach((icon, index) => {
-      const pos = getPositionForIcon(icon.id, index);
-      positions.set(icon.id, pos);
+      const defaultPos = getPositionForIcon(icon.id, index);
+      // Find nearest available position to avoid overlaps
+      const finalPos = findNearestAvailablePosition(
+        defaultPos.x,
+        defaultPos.y,
+        icon.id,
+        positions
+      );
+      positions.set(icon.id, finalPos);
+      // Save to localStorage if it's different from default
+      if (finalPos.x !== defaultPos.x || finalPos.y !== defaultPos.y) {
+        saveIconPosition(icon.id, finalPos.x, finalPos.y);
+      }
     });
     setIconPositions(positions);
-  }, [desktopIcons, getPositionForIcon]);
+  }, [desktopIcons, getPositionForIcon, findNearestAvailablePosition, saveIconPosition]);
 
-  // Handle icon position change
+  // Handle icon position change with collision detection
   const handlePositionChange = useCallback(
     (iconId: string, x: number, y: number) => {
-      saveIconPosition(iconId, x, y);
+      // Snap to grid first
+      const snapped = snapToGrid(x, y);
+      
+      // Find nearest available position (handles collision detection)
+      const finalPosition = findNearestAvailablePosition(
+        snapped.x,
+        snapped.y,
+        iconId,
+        iconPositions
+      );
+      
+      // Save the final position
+      saveIconPosition(iconId, finalPosition.x, finalPosition.y);
       setIconPositions((prev) => {
         const newMap = new Map(prev);
-        newMap.set(iconId, { x, y });
+        newMap.set(iconId, finalPosition);
         return newMap;
       });
     },
-    [saveIconPosition]
+    [saveIconPosition, snapToGrid, findNearestAvailablePosition, iconPositions]
   );
 
   // Handle app launch (reuse Taskbar logic)
@@ -169,22 +198,22 @@ export default function DesktopIcons() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[1]" style={{ paddingBottom: '48px', pointerEvents: 'none' }}>
-      <div className="absolute inset-0">
+    <div className="fixed inset-0 z-[1]" style={{ paddingBottom: '48px' }}>
+      <div className="absolute inset-0 pointer-events-none">
         {desktopIcons.map((icon, index) => {
           const position = iconPositions.get(icon.id) || getPositionForIcon(icon.id, index);
           
           return (
-            <div key={icon.id} style={{ pointerEvents: 'auto' }}>
-              <DesktopIconItem
-                icon={icon}
-                position={position}
-                isSelected={selectedIconId === icon.id}
-                onSelect={setSelectedIconId}
-                onDoubleClick={handleIconDoubleClick}
-                onPositionChange={handlePositionChange}
-              />
-            </div>
+            <DesktopIconItem
+              key={icon.id}
+              icon={icon}
+              position={position}
+              isSelected={selectedIconId === icon.id}
+              onSelect={setSelectedIconId}
+              onDoubleClick={handleIconDoubleClick}
+              onPositionChange={handlePositionChange}
+              allIconPositions={iconPositions}
+            />
           );
         })}
       </div>
