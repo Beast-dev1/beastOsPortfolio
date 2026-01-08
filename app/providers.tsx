@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { WindowProvider } from '@/Context/windowContext';
 import { FileSystemProvider } from '@/Context/FileSystemContext';
+import { WallpaperProvider } from '@/Context/WallpaperContext';
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -10,9 +11,11 @@ export interface ProvidersProps {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <WindowProvider>
-      <FileSystemProvider>{children}</FileSystemProvider>
-    </WindowProvider>
+    <WallpaperProvider>
+      <WindowProvider>
+        <FileSystemProvider>{children}</FileSystemProvider>
+      </WindowProvider>
+    </WallpaperProvider>
   );
 }
 

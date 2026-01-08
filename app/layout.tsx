@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import DynamicWallpaper from "@/components/DynamicWallpaper";
 
 export const metadata: Metadata = {
   title: "Windows 11 Portfolio OS",
@@ -14,8 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="win11-cursor">
-      <body className="min-h-screen font-segoe antialiased bg-windows11-wallpaper bg-cover bg-center">
-        <Providers>{children}</Providers>
+      <body className="min-h-screen font-segoe antialiased bg-cover bg-center">
+        <Providers>
+          <DynamicWallpaper />
+          {children}
+        </Providers>
       </body>
     </html>
   );

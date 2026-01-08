@@ -23,6 +23,7 @@ import { appConfig } from '@/config/apps';
 import Terminal from './Terminal';
 import FileExplorer from './FileExplorer';
 import Chrome from './Chrome';
+import Photos from './Photos';
 
 interface StartMenuProps {
   isOpen: boolean;
@@ -75,6 +76,8 @@ export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
         addWindow(appId, <FileExplorer />, 1000, 700, appIcon);
       } else if (appId === 'GoogleChrome') {
         addWindow(appId, <Chrome />, 1200, 800, appIcon);
+      } else if (appId === 'Photos') {
+        addWindow(appId, <Photos />, 1000, 700, appIcon);
       } else {
         // Default placeholder for other apps
         addWindow(

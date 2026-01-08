@@ -9,6 +9,7 @@ import { appConfig } from '@/config/apps';
 import Terminal from './Terminal';
 import FileExplorer from './FileExplorer';
 import Chrome from './Chrome';
+import Photos from './Photos';
 
 export default function DesktopIcons() {
   const { 
@@ -99,6 +100,11 @@ export default function DesktopIcons() {
 
         if (appId === 'GoogleChrome') {
           addWindow(appId, <Chrome />, 1200, 800, appIcon);
+          return;
+        }
+
+        if (appId === 'Photos') {
+          addWindow(appId, <Photos />, 1000, 700, appIcon);
           return;
         }
 
