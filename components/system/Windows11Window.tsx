@@ -180,17 +180,17 @@ export default function Windows11Window({
         }}
       >
         {/* Windows 11 Title Bar */}
-        <div className="window-header flex items-center justify-between px-0 bg-gradient-to-b from-[#fafafa] to-[#f0f0f0] dark:from-[#2d2d2d] dark:to-[#252525] border-b border-[#e5e5e5] dark:border-[#3a3a3a] h-11 select-none">
+        <div className="window-header flex items-center justify-between px-0 bg-gradient-to-b from-[#fafafa] to-[#f0f0f0] dark:from-[#2d2d2d] dark:to-[#252525] border-b border-[#e5e5e5] dark:border-[#3a3a3a] h-10 md:h-11 select-none">
           {/* Left side: Icon and Title */}
-          <div className="flex items-center px-4 flex-1 min-w-0">
+          <div className="flex items-center px-2 md:px-4 flex-1 min-w-0">
             <Image
               alt={title}
-              className="w-4 h-4 mr-3 flex-shrink-0"
+              className="w-3.5 h-3.5 md:w-4 md:h-4 mr-2 md:mr-3 flex-shrink-0"
               src={icon}
               width={16}
               height={16}
             />
-            <h3 className="text-sm font-normal text-[#1a1a1a] dark:text-[#ffffff] truncate">
+            <h3 className="text-xs md:text-sm font-normal text-[#1a1a1a] dark:text-[#ffffff] truncate">
               {title}
             </h3>
           </div>
@@ -199,20 +199,20 @@ export default function Windows11Window({
           <div className="flex items-center h-full">
             {/* Minimize Button */}
             <button
-              className="w-11 h-11 flex items-center justify-center hover:bg-[#e5e5e5] dark:hover:bg-[#3a3a3a] transition-colors duration-150 focus:outline-none group"
+              className="w-9 h-9 md:w-11 md:h-11 flex items-center justify-center hover:bg-[#e5e5e5] dark:hover:bg-[#3a3a3a] transition-colors duration-150 focus:outline-none group"
               onClick={handleMinimize}
               aria-label="Minimize"
               onMouseDown={(e) => e.stopPropagation()}
             >
               <Minus
-                className="w-4 h-4 text-[#1a1a1a] dark:text-[#ffffff] group-hover:scale-110 transition-transform"
+                className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#1a1a1a] dark:text-[#ffffff] group-hover:scale-110 transition-transform"
                 strokeWidth={2.5}
               />
             </button>
 
             {/* Maximize/Restore Button */}
             <button
-              className="w-11 h-11 flex items-center justify-center hover:bg-[#e5e5e5] dark:hover:bg-[#3a3a3a] transition-colors duration-150 focus:outline-none group"
+              className="hidden md:flex w-11 h-11 items-center justify-center hover:bg-[#e5e5e5] dark:hover:bg-[#3a3a3a] transition-colors duration-150 focus:outline-none group"
               onClick={handleMaximize}
               aria-label={win.isMaximized ? 'Restore' : 'Maximize'}
               onMouseDown={(e) => e.stopPropagation()}
@@ -233,13 +233,13 @@ export default function Windows11Window({
 
             {/* Close Button */}
             <button
-              className="w-11 h-11 flex items-center justify-center hover:bg-[#e81123] hover:text-white transition-colors duration-150 focus:outline-none group"
+              className="w-9 h-9 md:w-11 md:h-11 flex items-center justify-center hover:bg-[#e81123] hover:text-white transition-colors duration-150 focus:outline-none group"
               onClick={handleClose}
               aria-label="Close"
               onMouseDown={(e) => e.stopPropagation()}
             >
               <X
-                className="w-4 h-4 text-[#1a1a1a] dark:text-[#ffffff] group-hover:text-white group-hover:scale-110 transition-all"
+                className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#1a1a1a] dark:text-[#ffffff] group-hover:text-white group-hover:scale-110 transition-all"
                 strokeWidth={2.5}
               />
             </button>

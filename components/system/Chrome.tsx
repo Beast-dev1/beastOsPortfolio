@@ -296,12 +296,12 @@ export default function Chrome() {
   return (
     <div className="w-full h-full flex flex-col bg-white overflow-hidden">
       {/* Title Bar - Green */}
-      <div className="h-8 bg-[#1e7e34] flex items-center justify-between px-2">
-        <div className="flex items-center gap-1">
+      <div className="h-8 bg-[#1e7e34] flex items-center justify-between px-1 md:px-2 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-0.5 md:gap-1 min-w-0">
           {tabs.map((tab) => (
             <motion.div
               key={tab.id}
-              className={`group flex items-center gap-2 px-3 h-6 rounded-t cursor-pointer ${
+              className={`group flex items-center gap-1 md:gap-2 px-2 md:px-3 h-6 rounded-t cursor-pointer flex-shrink-0 ${
                 tab.id === activeTabId
                   ? 'bg-white'
                   : 'bg-[#2d8f47] hover:bg-[#26803d]'
@@ -318,13 +318,13 @@ export default function Chrome() {
                   }}
                 />
               ) : null}
-              <span className={`text-xs truncate max-w-[120px] ${
+              <span className={`text-[10px] md:text-xs truncate max-w-[60px] md:max-w-[120px] ${
                 tab.id === activeTabId ? 'text-gray-800' : 'text-white'
               }`}>
                 {tab.title}
               </span>
               <button
-                className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-gray-200 transition-opacity"
+                className="opacity-0 md:group-hover:opacity-100 p-0.5 rounded hover:bg-gray-200 transition-opacity flex-shrink-0"
                 onClick={(e) => {
                   e.stopPropagation();
                   closeTab(tab.id);
@@ -335,7 +335,7 @@ export default function Chrome() {
             </motion.div>
           ))}
           <button
-            className="px-2 h-6 rounded-t bg-[#2d8f47] hover:bg-[#26803d] transition-colors"
+            className="px-1.5 md:px-2 h-6 rounded-t bg-[#2d8f47] hover:bg-[#26803d] transition-colors flex-shrink-0"
             onClick={createNewTab}
             title="New Tab"
           >
@@ -345,48 +345,48 @@ export default function Chrome() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-1 px-2 py-1 bg-white border-b border-gray-200">
+      <div className="flex items-center gap-0.5 md:gap-1 px-1 md:px-2 py-1 bg-white border-b border-gray-200">
         {/* Navigation Buttons */}
-        <div className="flex items-center gap-0.5">
+        <div className="flex items-center gap-0 md:gap-0.5 flex-shrink-0">
           <button
-            className="p-1.5 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-1 md:p-1.5 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             onClick={navigateBack}
             disabled={activeTab.historyIndex < 0}
             title="Back"
           >
-            <ArrowLeft className="w-4 h-4 text-gray-700" />
+            <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-700" />
           </button>
           <button
-            className="p-1.5 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-1 md:p-1.5 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             onClick={navigateForward}
             disabled={activeTab.historyIndex >= activeTab.history.length - 1}
             title="Forward"
           >
-            <ArrowRight className="w-4 h-4 text-gray-700" />
+            <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-700" />
           </button>
           <button
-            className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+            className="p-1 md:p-1.5 hover:bg-gray-100 rounded transition-colors"
             onClick={refreshPage}
             title="Refresh"
           >
             <RefreshCw
-              className={`w-4 h-4 text-gray-700 ${activeTab.isLoading ? 'animate-spin' : ''}`}
+              className={`w-3.5 h-3.5 md:w-4 md:h-4 text-gray-700 ${activeTab.isLoading ? 'animate-spin' : ''}`}
             />
           </button>
         </div>
 
         {/* Address Bar */}
-        <form onSubmit={handleUrlSubmit} className="flex-1 flex items-center gap-2 mx-2">
-          <div className="flex-1 relative flex items-center bg-white border border-gray-300 rounded-md shadow-sm hover:shadow-md transition-shadow">
-            <Search className="absolute left-3 w-4 h-4 text-gray-400 pointer-events-none" />
+        <form onSubmit={handleUrlSubmit} className="flex-1 flex items-center gap-1 md:gap-2 mx-1 md:mx-2 min-w-0">
+          <div className="flex-1 relative flex items-center bg-white border border-gray-300 rounded-md shadow-sm hover:shadow-md transition-shadow min-w-0">
+            <Search className="absolute left-2 md:left-3 w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400 pointer-events-none" />
             <input
               type="text"
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
-              className="w-full px-10 py-1.5 text-sm text-gray-800 focus:outline-none"
+              className="w-full px-8 md:px-10 py-1 md:py-1.5 text-xs md:text-sm text-gray-800 focus:outline-none"
               placeholder={activeTab.isNewTab ? "Search Google or type a URL" : activeTab.url}
             />
-            <div className="flex items-center gap-1 pr-2">
+            <div className="hidden md:flex items-center gap-1 pr-2">
               <button
                 type="button"
                 className="p-1 hover:bg-gray-100 rounded transition-colors"
@@ -415,10 +415,10 @@ export default function Chrome() {
             style={{ display: tab.id === activeTabId ? 'block' : 'none' }}
           >
             {tab.isNewTab || !tab.url ? (
-              <div className="w-full h-full flex flex-col items-center justify-start pt-[120px] bg-white overflow-y-auto">
+              <div className="w-full h-full flex flex-col items-center justify-start pt-16 md:pt-[120px] bg-white overflow-y-auto px-4">
                 {/* Google Logo */}
-                <div className="mb-8">
-                  <div className="text-[90px] font-normal tracking-tight leading-none">
+                <div className="mb-4 md:mb-8">
+                  <div className="text-[48px] md:text-[90px] font-normal tracking-tight leading-none">
                     <span className="text-[#4285F4]">G</span>
                     <span className="text-[#EA4335]">o</span>
                     <span className="text-[#FBBC05]">o</span>
@@ -429,22 +429,22 @@ export default function Chrome() {
                 </div>
                 
                 {/* Google CSE Search Bar */}
-                <div className="w-full max-w-[584px] px-4 mb-6">
+                <div className="w-full max-w-[584px] mb-4 md:mb-6">
                   <div className="gcse-searchbox-only" data-gname="searchresults"></div>
                 </div>
                 
                 {/* Search Buttons */}
-                <div className="flex gap-3 mb-8">
-                  <button className="px-4 py-2 bg-[#f8f9fa] text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all">
+                <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mb-4 md:mb-8 w-full max-w-[584px]">
+                  <button className="px-4 py-2 bg-[#f8f9fa] text-xs md:text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all">
                     Google Search
                   </button>
-                  <button className="px-4 py-2 bg-[#f8f9fa] text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all">
+                  <button className="px-4 py-2 bg-[#f8f9fa] text-xs md:text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all">
                     I'm Feeling Lucky
                   </button>
                 </div>
                 
                 {/* Search Results Container */}
-                <div className="w-full max-w-[652px] px-4 pb-8">
+                <div className="w-full max-w-[652px] pb-4 md:pb-8">
                   <div className="gcse-searchresults-only" data-gname="searchresults"></div>
                 </div>
               </div>

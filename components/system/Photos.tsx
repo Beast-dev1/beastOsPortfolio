@@ -139,14 +139,14 @@ export default function Photos() {
       {/* Grid Container */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto p-6"
+        className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6"
         onClick={handleCloseContextMenu}
       >
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
           {WALLPAPERS.map((wallpaper, index) => (
             <div
               key={index}
-              className="group relative aspect-video rounded-lg overflow-hidden cursor-pointer bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.1)] transition-all"
+              className="group relative aspect-video rounded-md md:rounded-lg overflow-hidden cursor-pointer bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.1)] transition-all"
               onContextMenu={(e) => handleContextMenu(e, wallpaper)}
               onClick={() => handleOpen(wallpaper)}
             >

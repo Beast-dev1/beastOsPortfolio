@@ -355,9 +355,9 @@ export default function Terminal() {
     : 'PS C:\\Users\\Prakash>';
 
   return (
-    <div className="bg-[#0d1117] text-[#c9d1d9] font-mono text-sm w-full h-full flex flex-col overflow-hidden">
+    <div className="bg-[#0d1117] text-[#c9d1d9] font-mono text-xs md:text-sm w-full h-full flex flex-col overflow-hidden">
       {/* Terminal Content Area */}
-      <div className="flex-grow overflow-y-auto p-4">
+      <div className="flex-grow overflow-y-auto p-2 md:p-4">
         {lines.map((line, index) => (
           <div
             key={index}
@@ -377,13 +377,13 @@ export default function Terminal() {
 
       {/* Input Area */}
       <form
-        className="flex items-center bg-[#161b22] border-t border-[#30363d] px-4 py-2"
+        className="flex items-center bg-[#161b22] border-t border-[#30363d] px-2 md:px-4 py-1.5 md:py-2"
         onSubmit={handleSubmit}
       >
-        <span className="text-[#58a6ff] mr-2 select-none">{prompt}</span>
+        <span className="text-[#58a6ff] mr-1 md:mr-2 select-none text-xs md:text-sm whitespace-nowrap overflow-hidden">{prompt}</span>
         <input
           ref={inputRef}
-          className="flex-grow bg-transparent outline-none text-[#c9d1d9] caret-[#58a6ff]"
+          className="flex-grow bg-transparent outline-none text-[#c9d1d9] caret-[#58a6ff] text-xs md:text-sm"
           type="text"
           value={input}
           onChange={handleInputChange}

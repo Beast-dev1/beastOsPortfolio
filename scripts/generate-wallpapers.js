@@ -76,3 +76,4 @@ console.log('Alternatively, you can use online tools like:');
 console.log('- https://htmlcsstoimage.com/');
 console.log('- Or add your own wallpaper images to public/wallpapers/');
 
+

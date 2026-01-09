@@ -142,7 +142,7 @@ export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-16 left-64 -translate-x-1/2 z-[10000] w-[1000px] h-[600px] rounded-2xl overflow-hidden"
+            className="fixed bottom-16 left-1/2 -translate-x-1/2 z-[10000] w-[calc(100vw-2rem)] max-w-[1000px] h-[calc(100vh-8rem)] max-h-[600px] md:h-[600px] rounded-2xl overflow-hidden"
             style={{
               background: 'rgba(30, 30, 30, 0.95)',
               backdropFilter: 'blur(40px)',
@@ -150,9 +150,9 @@ export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
             }}
           >
-            <div className="flex h-full">
+            <div className="flex flex-col md:flex-row h-full">
               {/* Main Content */}
-              <div className="w-[700px] flex flex-col overflow-hidden border-r border-[rgba(255,255,255,0.1)]">
+              <div className="w-full md:w-[700px] flex flex-col overflow-hidden border-b md:border-b-0 md:border-r border-[rgba(255,255,255,0.1)]">
                 {/* Search Bar */}
                 <div className="px-2 pt-2 pb-1">
                   <div className="relative">
@@ -181,26 +181,26 @@ export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
                           All <ChevronRight className="w-3 h-3" />
                         </button>
                       </div>
-                      <div className="grid grid-cols-6 gap-1">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1">
                         {appConfig.pinnedApps.map((app) => (
                           <motion.button
                             key={app.id}
                             onClick={() => handleAppClick(app.id, app.name, app.icon)}
-                            className="flex flex-col items-center gap-2.5 p-3 rounded-xl hover:bg-[rgba(255,255,255,0.1)] transition-colors group"
+                            className="flex flex-col items-center gap-1.5 md:gap-2.5 p-2 md:p-3 rounded-xl hover:bg-[rgba(255,255,255,0.1)] transition-colors group"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                           >
-                            <div className="w-14 h-14 rounded-xl bg-[rgba(255,255,255,0.05)] flex items-center justify-center overflow-hidden shadow-sm">
+                            <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-[rgba(255,255,255,0.05)] flex items-center justify-center overflow-hidden shadow-sm">
                               <Image
                                 src={app.icon}
                                 alt={app.name}
                                 width={40}
                                 height={40}
-                                className="w-10 h-10 object-contain"
+                                className="w-8 h-8 md:w-10 md:h-10 object-contain"
                                 unoptimized
                               />
                             </div>
-                            <span className="text-xs text-gray-300 group-hover:text-white transition-colors text-center leading-tight max-w-full truncate">
+                            <span className="text-[10px] md:text-xs text-gray-300 group-hover:text-white transition-colors text-center leading-tight max-w-full truncate">
                               {app.name}
                             </span>
                           </motion.button>
@@ -375,7 +375,7 @@ export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
               </div>
 
               {/* Connected Phone Sidebar */}
-              <div className="flex-1 flex flex-col bg-[rgba(20,20,20,0.3)]">
+              <div className="hidden md:flex flex-1 flex-col bg-[rgba(20,20,20,0.3)]">
                 {/* Device Info */}
                 <div className="px-4 pt-4 pb-3">
                   <div className="flex flex-col items-center gap-3">

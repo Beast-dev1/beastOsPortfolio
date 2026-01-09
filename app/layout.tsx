@@ -6,6 +6,12 @@ import DynamicWallpaper from "@/components/DynamicWallpaper";
 export const metadata: Metadata = {
   title: "Windows 11 Portfolio OS",
   description: "A Windows 11-inspired portfolio operating system",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
 };
 
 export default function RootLayout({

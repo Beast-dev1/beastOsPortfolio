@@ -36,19 +36,20 @@ export default React.memo(function DesktopIconItem({
   // Memoize drag constraints to avoid recalculation during drag
   // Grid cell size is 100px, icon width is 80px
   const dragConstraints = useRef({
-    left: 20,
-    top: 20,
-    right: typeof window !== 'undefined' ? window.innerWidth - 100 : 1000,
+    left: 10,
+    top: 10,
+    right: typeof window !== 'undefined' ? window.innerWidth - 90 : 1000,
     bottom: typeof window !== 'undefined' ? window.innerHeight - 140 : 800,
   });
   
   // Update constraints on window resize
   useEffect(() => {
     const updateConstraints = () => {
+      const isMobile = window.innerWidth < 768;
       dragConstraints.current = {
-        left: 20,
-        top: 20,
-        right: window.innerWidth - 100,
+        left: isMobile ? 10 : 20,
+        top: isMobile ? 10 : 20,
+        right: window.innerWidth - (isMobile ? 90 : 100),
         bottom: window.innerHeight - 140,
       };
     };
@@ -163,11 +164,11 @@ export default React.memo(function DesktopIconItem({
       <div
         className={`
           flex flex-col items-center justify-center
-          w-20
-          p-2 rounded-lg
+          w-16 md:w-20
+          p-1.5 md:p-2 rounded-lg
           transition-all duration-150
           ${isSelected ? 'bg-blue-500/30 backdrop-blur-sm' : ''}
-          ${!isDragging && !isSelected ? 'hover:bg-white/10 hover:backdrop-blur-sm' : ''}
+          ${!isDragging && !isSelected ? 'hover:bg-white/10 hover:backdrop-blur-sm active:bg-white/20' : ''}
         `}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
@@ -175,9 +176,9 @@ export default React.memo(function DesktopIconItem({
         {/* Icon Container */}
         <div
           className={`
-            w-16 h-16 rounded-lg
+            w-12 h-12 md:w-16 md:h-16 rounded-lg
             flex items-center justify-center
-            mb-1
+            mb-0.5 md:mb-1
             ${isSelected ? 'ring-2 ring-blue-400' : ''}
             transition-all duration-150
           `}
@@ -188,7 +189,7 @@ export default React.memo(function DesktopIconItem({
               alt={icon.name}
               width={64}
               height={64}
-              className="w-16 h-16 object-contain"
+              className="w-12 h-12 md:w-16 md:h-16 object-contain"
               unoptimized
             />
           ) : (
@@ -204,9 +205,9 @@ export default React.memo(function DesktopIconItem({
         {/* Label */}
         <div
           className={`
-            text-xs text-white text-center
-            px-1 py-0.5 rounded
-            max-w-[80px] break-words
+            text-[10px] md:text-xs text-white text-center
+            px-0.5 md:px-1 py-0 md:py-0.5 rounded
+            max-w-[64px] md:max-w-[80px] break-words
             leading-tight
             ${isSelected ? 'bg-blue-500/50' : ''}
             transition-all duration-150

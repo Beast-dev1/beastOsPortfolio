@@ -77,6 +77,7 @@ export default function FileExplorer() {
   const [isCutting, setIsCutting] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const [currentPath, setCurrentPath] = useState<string>('Home');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const addressBarRef = useRef<HTMLInputElement>(null);
 
   // Initialize navigation history
@@ -291,30 +292,38 @@ export default function FileExplorer() {
   return (
     <div className="flex flex-col h-full bg-[#1a1a1a] dark:bg-[#1a1a1a] text-white overflow-hidden">
       {/* Navigation Bar */}
-      <div className="flex items-center gap-1 px-2 py-1.5 border-b border-[#3a3a3a] dark:border-[#3a3a3a] bg-[#252525] dark:bg-[#252525]">
+      <div className="flex items-center gap-0.5 md:gap-1 px-1 md:px-2 py-1 md:py-1.5 border-b border-[#3a3a3a] dark:border-[#3a3a3a] bg-[#252525] dark:bg-[#252525]">
+        {/* Mobile Sidebar Toggle */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="md:hidden p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+          aria-label="Toggle Sidebar"
+        >
+          <LayoutGrid className="w-4 h-4" />
+        </button>
         <button
           onClick={navigateBack}
           disabled={!canGoBack}
-          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
+          className={`p-1 md:p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
             !canGoBack ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           aria-label="Back"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
         </button>
         <button
           onClick={navigateForward}
           disabled={!canGoForward}
-          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
+          className={`p-1 md:p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
             !canGoForward ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           aria-label="Forward"
         >
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
         </button>
         <button
           onClick={navigateUp}
-          className="p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+          className="hidden sm:block p-1 md:p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors"
           aria-label="Up"
         >
           <ChevronUp className="w-4 h-4" />
@@ -324,12 +333,12 @@ export default function FileExplorer() {
             // Refresh current view
             setCurrentDirectory(currentDirectory);
           }}
-          className="p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+          className="p-1 md:p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors"
           aria-label="Refresh"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="w-3.5 h-3.5 md:w-4 md:h-4" />
         </button>
-        <div className="flex items-center gap-1 px-2 flex-1 min-w-0">
+        <div className="hidden md:flex items-center gap-1 px-2 flex-1 min-w-0">
           <Home className="w-4 h-4 text-gray-400 flex-shrink-0" />
           <span className="text-sm text-gray-300"> &gt; </span>
           <input
@@ -346,14 +355,14 @@ export default function FileExplorer() {
             className="flex-1 bg-transparent text-sm text-white outline-none px-1"
           />
         </div>
-        <div className="relative flex items-center">
-          <Search className="w-4 h-4 text-gray-400 absolute left-2 pointer-events-none" />
+        <div className="relative flex items-center flex-1 md:flex-none">
+          <Search className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400 absolute left-2 pointer-events-none" />
           <input
             type="text"
             placeholder="Search Home"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-48 h-7 pl-8 pr-2 rounded bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.15)] focus:bg-[rgba(255,255,255,0.15)] border border-transparent focus:border-[rgba(255,255,255,0.2)] text-white placeholder-gray-400 text-sm outline-none transition-all"
+            className="w-full md:w-48 h-6 md:h-7 pl-7 md:pl-8 pr-2 rounded bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.15)] focus:bg-[rgba(255,255,255,0.15)] border border-transparent focus:border-[rgba(255,255,255,0.2)] text-white placeholder-gray-400 text-xs md:text-sm outline-none transition-all"
           />
         </div>
       </div>
@@ -498,9 +507,21 @@ export default function FileExplorer() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {/* Left Navigation Pane */}
-        <div className="w-64 border-r border-[#3a3a3a] dark:border-[#3a3a3a] bg-[#1a1a1a] dark:bg-[#1a1a1a] flex flex-col">
+        <div className={`absolute md:relative z-20 w-64 h-full border-r border-[#3a3a3a] dark:border-[#3a3a3a] bg-[#1a1a1a] dark:bg-[#1a1a1a] flex flex-col transition-transform duration-300 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}>
+          {/* Mobile Close Button */}
+          <div className="md:hidden flex items-center justify-between p-2 border-b border-[#3a3a3a]">
+            <span className="text-sm text-white font-medium">Navigation</span>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-1 rounded hover:bg-[rgba(255,255,255,0.1)]"
+            >
+              <X className="w-4 h-4 text-white" />
+            </button>
+          </div>
           <div className="flex-1 overflow-y-auto p-2">
             {/* Pinned Items */}
             <div className="space-y-0.5">
@@ -582,14 +603,22 @@ export default function FileExplorer() {
           </div>
         </div>
 
+        {/* Mobile Overlay */}
+        {sidebarOpen && (
+          <div
+            className="md:hidden fixed inset-0 bg-black/50 z-10"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         {/* Main Content Area */}
         <div className="flex-1 overflow-y-auto bg-[#1a1a1a] dark:bg-[#1a1a1a]">
           {currentView === 'home' ? (
-            <div className="p-4">
+            <div className="p-2 md:p-4">
               {/* Quick Access Section */}
               <div className="mb-4">
-                <h2 className="text-sm font-semibold text-gray-300 mb-3">Quick access</h2>
-                <div className="grid grid-cols-6 gap-4">
+                <h2 className="text-xs md:text-sm font-semibold text-gray-300 mb-2 md:mb-3">Quick access</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
                   {fileExplorerConfig.quickAccessItems.map((item) => (
                     <button
                       key={item.id}
@@ -716,10 +745,10 @@ export default function FileExplorer() {
               )}
             </div>
           ) : (
-            <div className="p-4">
+            <div className="p-2 md:p-4">
               {/* File List View */}
               {viewMode === 'grid' && (
-                <div className="grid grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
                   {filteredFiles.map((file) => (
                     <button
                       key={file.id}
