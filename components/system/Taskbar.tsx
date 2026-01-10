@@ -159,7 +159,7 @@ export default function Taskbar() {
 
           {/* Search Bar (Hidden on small mobile, visible on larger screens) */}
           <div className="hidden sm:block relative flex items-center">
-            <Search className="w-4 h-4 text-white absolute left-2 md:left-3 pointer-events-none" />
+            <Search className="w-4 h-4 text-white absolute left-2 md:left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Search"
