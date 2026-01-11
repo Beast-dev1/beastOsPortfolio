@@ -148,13 +148,15 @@ export default function Taskbar() {
             onClick={() => setIsStartMenuOpen(!isStartMenuOpen)}
             aria-label="Start Menu"
           >
-            {/* Windows 11 Logo - Four squares */}
-            <svg className="w-5 h-5 md:w-7 md:h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="2" width="9" height="9" rx="0.5" fill="#0078D4"/>
-              <rect x="13" y="2" width="9" height="9" rx="0.5" fill="#0078D4"/>
-              <rect x="2" y="13" width="9" height="9" rx="0.5" fill="#0078D4"/>
-              <rect x="13" y="13" width="9" height="9" rx="0.5" fill="#0078D4"/>
-            </svg>
+            {/* Windows 11 Logo */}
+            <Image
+              src="/icons/windows/windows.png"
+              alt="Windows Logo"
+              width={28}
+              height={28}
+              className="w-5 h-5 md:w-7 md:h-7 object-contain"
+              unoptimized
+            />
           </button>
 
           {/* Search Bar (Hidden on small mobile, visible on larger screens) */}
@@ -197,7 +199,7 @@ export default function Taskbar() {
                   {/* Active indicator line */}
                   {isActive && (
                     <motion.div
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-0.5 bg-[#0078D4] rounded-t-full"
+                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 h-0.5 bg-[#0078D4] rounded-full"
                       layoutId="activeIndicator"
                       initial={false}
                     />

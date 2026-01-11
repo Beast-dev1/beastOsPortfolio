@@ -142,7 +142,7 @@ export default function DesktopIcons() {
         setCurrentDirectory(folderId);
       } else {
         // Open new File Explorer window at the folder
-        const appIcon = '/cursor/file-part-2-svgrepo-com.svg';
+        const appIcon = '/icons/explorer/explorer.png';
         addWindow('FileExplorer', <FileExplorer />, 1000, 700, appIcon);
         // Navigate to folder after a small delay to ensure FileExplorer is mounted
         setTimeout(() => {
@@ -168,7 +168,7 @@ export default function DesktopIcons() {
         bringToFront('FileExplorer');
         setCurrentDirectory(parentId);
       } else {
-        const appIcon = '/cursor/file-part-2-svgrepo-com.svg';
+        const appIcon = '/icons/explorer/explorer.png';
         addWindow('FileExplorer', <FileExplorer />, 1000, 700, appIcon);
         setTimeout(() => {
           setCurrentDirectory(parentId);

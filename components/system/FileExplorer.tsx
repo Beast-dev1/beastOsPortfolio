@@ -46,7 +46,7 @@ import Terminal from './Terminal';
 
 type ViewMode = 'grid' | 'list' | 'details';
 type TabType = 'recent' | 'favorites' | 'shared';
-type CurrentView = 'home' | 'folder';
+type CurrentView = 'home' | 'folder' | 'thispc' | 'drive';
 
 interface NavigationHistory {
   path: string | null;
@@ -75,10 +75,75 @@ export default function FileExplorer() {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [copiedItems, setCopiedItems] = useState<File[]>([]);
   const [isCutting, setIsCutting] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['thispc']));
   const [currentPath, setCurrentPath] = useState<string>('Home');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const addressBarRef = useRef<HTMLInputElement>(null);
+
+  // Drive storage data
+  const drives = [
+    {
+      id: 'c',
+      name: 'Local Disk (C:)',
+      icon: '/icons/drives/c.png',
+      totalGB: 237,
+      freeGB: 97.4,
+      hasWindowsLogo: true,
+    },
+    {
+      id: 'd',
+      name: 'Local Disk (D:)',
+      icon: '/icons/drives/d.png',
+      totalGB: 465,
+      freeGB: 462.0,
+      hasWindowsLogo: false,
+    },
+  ];
+
+  // System folders for C: drive
+  interface DriveItem {
+    name: string;
+    dateModified: string;
+    type: string;
+    size: string;
+    icon?: string;
+    id?: string;
+  }
+
+  const cDriveFolders: DriveItem[] = [
+    { name: 'Intel', dateModified: '7/13/2025 7:58 PM', type: 'File folder', size: '-' },
+    { name: 'PerfLogs', dateModified: '4/1/2024 1:11 PM', type: 'File folder', size: '-' },
+    { name: 'Program Files', dateModified: '12/14/2025 4:01 PM', type: 'File folder', size: '-' },
+    { name: 'Program Files (x86)', dateModified: '12/10/2025 1:21 PM', type: 'File folder', size: '-' },
+    { name: 'Users', dateModified: '12/10/2025 11:26 AM', type: 'File folder', size: '-' },
+    { name: 'Windows', dateModified: '1/4/2026 3:45 PM', type: 'File folder', size: '-' },
+    { name: 'Windows.old', dateModified: '12/10/2025 11:31 AM', type: 'File folder', size: '-' },
+    { name: 'DumpStack.log', dateModified: '11/22/2025 8:12 PM', type: 'LOG File', size: '12 KB' },
+  ];
+
+  const dDriveFolders: DriveItem[] = [];
+
+  // Get drive contents (folders + applications)
+  const getDriveContents = (driveId: string): DriveItem[] => {
+    const folders = driveId === 'c' ? cDriveFolders : dDriveFolders;
+    // Only add applications to D: drive, not C: drive
+    if (driveId === 'd') {
+      // Filter out File Explorer from applications
+      const apps: DriveItem[] = appConfig.taskbarApps
+        .filter((app) => app.id !== 'FileExplorer')
+        .map((app) => ({
+          name: app.name,
+          dateModified: new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+          type: 'Application',
+          size: '-',
+          icon: app.icon,
+          id: app.id,
+        }));
+      return [...folders, ...apps];
+    }
+    // C: drive only has folders, no applications
+    return folders;
+  };
 
   // Initialize navigation history
   useEffect(() => {
@@ -87,6 +152,16 @@ export default function FileExplorer() {
       setHistoryIndex(0);
     }
   }, []);
+
+  // Initialize expanded sections
+  useEffect(() => {
+    if (currentView === 'thispc') {
+      setExpandedSections(new Set(['thispc', 'devices']));
+    }
+    if (currentView === 'drive') {
+      setViewMode('details');
+    }
+  }, [currentView]);
 
   // Get recent files (files accessed in last 7 days, sorted by lastAccessed)
   const getRecentFiles = (): File[] => {
@@ -123,6 +198,10 @@ export default function FileExplorer() {
       setCurrentPath(historyItem.path || 'Home');
       if (historyItem.path === 'Home') {
         setCurrentView('home');
+      } else if (historyItem.path === 'This PC') {
+        setCurrentView('thispc');
+      } else if (historyItem.directoryId?.startsWith('drive-')) {
+        setCurrentView('drive');
       } else {
         setCurrentView('folder');
       }
@@ -138,6 +217,10 @@ export default function FileExplorer() {
       setCurrentPath(historyItem.path || 'Home');
       if (historyItem.path === 'Home') {
         setCurrentView('home');
+      } else if (historyItem.path === 'This PC') {
+        setCurrentView('thispc');
+      } else if (historyItem.directoryId?.startsWith('drive-')) {
+        setCurrentView('drive');
       } else {
         setCurrentView('folder');
       }
@@ -163,6 +246,17 @@ export default function FileExplorer() {
   const navigateHome = () => {
     navigateTo(null, 'Home');
     setCurrentView('home');
+  };
+
+  const navigateToThisPC = () => {
+    setCurrentView('thispc');
+    setCurrentPath('This PC');
+    setCurrentDirectory(null);
+    // Add to history
+    const newHistory = navigationHistory.slice(0, historyIndex + 1);
+    newHistory.push({ path: 'This PC', directoryId: null });
+    setNavigationHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
   };
 
   const handleQuickAccessClick = (item: typeof fileExplorerConfig.quickAccessItems[0]) => {
@@ -281,7 +375,7 @@ export default function FileExplorer() {
     setIsCutting(false);
   };
 
-  const currentFiles = currentView === 'home' ? [] : getChildren(currentDirectory);
+  const currentFiles = currentView === 'home' || currentView === 'drive' || currentView === 'thispc' ? [] : getChildren(currentDirectory);
   const filteredFiles = currentFiles.filter((file) =>
     file.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -540,9 +634,23 @@ export default function FileExplorer() {
                 >
                   {item.pinned && <Pin className="w-3 h-3 text-gray-400 flex-shrink-0" />}
                   {item.type === 'drive' ? (
-                    <HardDrive className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <Image
+                      src="/icons/drives/c.png"
+                      alt={item.name}
+                      width={16}
+                      height={16}
+                      className="flex-shrink-0"
+                      unoptimized
+                    />
                   ) : (
-                    <Folder className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    <Image
+                      src={item.icon || '/icons/folder/folder.png'}
+                      alt={item.name}
+                      width={16}
+                      height={16}
+                      className="flex-shrink-0"
+                      unoptimized
+                    />
                   )}
                   <span className="text-sm text-gray-300 flex-1 text-left truncate">{item.name}</span>
                 </button>
@@ -553,24 +661,70 @@ export default function FileExplorer() {
             <div className="mt-4 space-y-0.5">
               <button
                 onClick={() => {
-                  const newExpanded = new Set(expandedSections);
-                  if (newExpanded.has('thispc')) {
-                    newExpanded.delete('thispc');
-                  } else {
-                    newExpanded.add('thispc');
-                  }
-                  setExpandedSections(newExpanded);
+                  // Navigate to This PC view
+                  navigateToThisPC();
                 }}
-                className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
+                  currentView === 'thispc' ? 'bg-[rgba(0,120,212,0.2)]' : ''
+                }`}
               >
                 <ChevronRight
-                  className={`w-3 h-3 text-gray-400 transition-transform ${
+                  className={`w-3 h-3 text-gray-400 transition-transform cursor-pointer ${
                     expandedSections.has('thispc') ? 'rotate-90' : ''
                   }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const newExpanded = new Set(expandedSections);
+                    if (newExpanded.has('thispc')) {
+                      newExpanded.delete('thispc');
+                    } else {
+                      newExpanded.add('thispc');
+                    }
+                    setExpandedSections(newExpanded);
+                  }}
                 />
-                <HardDrive className="w-4 h-4 text-gray-400" />
-                <span className="text-sm text-gray-300">This PC</span>
+                <Image
+                  src="/icons/this-pc/this-pc.png"
+                  alt="This PC"
+                  width={16}
+                  height={16}
+                  className="w-4 h-4 object-contain flex-shrink-0"
+                  unoptimized
+                />
+                <span className="text-sm text-gray-300 flex-1 text-left">This PC</span>
               </button>
+              {/* Drive items under This PC */}
+              {expandedSections.has('thispc') && (
+                <div className="ml-4 space-y-0.5">
+                  {drives.map((drive) => (
+                    <button
+                      key={drive.id}
+                      onClick={() => {
+                        setCurrentView('drive');
+                        setCurrentPath(drive.name);
+                        setCurrentDirectory(`drive-${drive.id}`);
+                        // Add to history
+                        const newHistory = navigationHistory.slice(0, historyIndex + 1);
+                        newHistory.push({ path: drive.name, directoryId: `drive-${drive.id}` });
+                        setNavigationHistory(newHistory);
+                        setHistoryIndex(newHistory.length - 1);
+                      }}
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+                    >
+                      <ChevronRight className="w-3 h-3 text-gray-400 opacity-0" />
+                      <Image
+                        src={drive.icon}
+                        alt={drive.name}
+                        width={16}
+                        height={16}
+                        className="w-4 h-4 object-contain flex-shrink-0"
+                        unoptimized
+                      />
+                      <span className="text-sm text-gray-300 flex-1 text-left truncate">{drive.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
               <button
                 onClick={() => {
                   const newExpanded = new Set(expandedSections);
@@ -597,6 +751,10 @@ export default function FileExplorer() {
             <span className="text-xs text-gray-400">
               {currentView === 'home'
                 ? fileExplorerConfig.quickAccessItems.length
+                : currentView === 'thispc'
+                ? drives.length
+                : currentView === 'drive'
+                ? getDriveContents(currentDirectory?.replace('drive-', '') || 'c').length
                 : filteredFiles.length}{' '}
               items
             </span>
@@ -613,7 +771,175 @@ export default function FileExplorer() {
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-y-auto bg-[#1a1a1a] dark:bg-[#1a1a1a]">
-          {currentView === 'home' ? (
+          {currentView === 'thispc' ? (
+            <div className="p-2 md:p-4">
+              {/* Devices and drives section */}
+              <div className="mb-4">
+                <button
+                  onClick={() => {
+                    const newExpanded = new Set(expandedSections);
+                    if (newExpanded.has('devices')) {
+                      newExpanded.delete('devices');
+                    } else {
+                      newExpanded.add('devices');
+                    }
+                    setExpandedSections(newExpanded);
+                  }}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 mb-2 hover:bg-[rgba(255,255,255,0.05)] rounded transition-colors"
+                >
+                  <ChevronDown
+                    className={`w-4 h-4 text-gray-400 transition-transform ${
+                      expandedSections.has('devices') ? '' : '-rotate-90'
+                    }`}
+                  />
+                  <span className="text-sm font-semibold text-gray-300">Devices and drives</span>
+                </button>
+                {expandedSections.has('devices') && (
+                  <div className="pl-6 flex flex-wrap gap-6">
+                    {drives.map((drive) => {
+                      const usedGB = drive.totalGB - drive.freeGB;
+                      const usedPercent = (usedGB / drive.totalGB) * 100;
+                      return (
+                        <div
+                          key={drive.id}
+                          onClick={() => {
+                            setCurrentView('drive');
+                            setCurrentPath(drive.name);
+                            setCurrentDirectory(`drive-${drive.id}`);
+                            // Add to history
+                            const newHistory = navigationHistory.slice(0, historyIndex + 1);
+                            newHistory.push({ path: drive.name, directoryId: `drive-${drive.id}` });
+                            setNavigationHistory(newHistory);
+                            setHistoryIndex(newHistory.length - 1);
+                          }}
+                          className="flex items-start gap-3 py-3 px-1 rounded hover:bg-[rgba(255,255,255,0.05)] transition-colors cursor-pointer group"
+                          style={{ minWidth: '280px', flex: '0 1 auto' }}
+                        >
+                          <div className="flex flex-col items-center flex-shrink-0" style={{ width: '56px' }}>
+                            <div className="relative">
+                              <Image
+                                src={drive.icon}
+                                alt={drive.name}
+                                width={48}
+                                height={48}
+                                className="w-12 h-12 object-contain"
+                                unoptimized
+                              />
+                              {drive.hasWindowsLogo && (
+                                <div className="absolute -top-0.5 -left-0.5 w-3.5 h-3.5 bg-[#0078D4] rounded-sm flex items-center justify-center shadow-sm">
+                                  <span className="text-[7px] text-white font-bold leading-none">W</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="w-2 h-2 bg-green-500 rounded-full border border-[#1a1a1a] mt-0.5"></div>
+                          </div>
+                          <div className="flex-1 min-w-0" style={{ minWidth: '200px' }}>
+                            <div className="text-sm font-medium text-gray-200 mb-2">{drive.name}</div>
+                            <div className="w-full h-2 bg-[rgba(255,255,255,0.1)] rounded-full overflow-hidden mb-1.5">
+                              <div
+                                className="h-full bg-[#0078D4] transition-all duration-300"
+                                style={{ width: `${usedPercent}%` }}
+                              ></div>
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {drive.freeGB.toFixed(1)} GB free of {drive.totalGB} GB
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : currentView === 'drive' ? (
+            <div className="p-2 md:p-4">
+              {/* Drive contents in details view */}
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-[#3a3a3a]">
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        <div className="flex items-center gap-1">
+                          Name
+                          <ChevronUp className="w-3 h-3" />
+                        </div>
+                      </th>
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        Date modified
+                      </th>
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        Type
+                      </th>
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        Size
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getDriveContents(currentDirectory?.replace('drive-', '') || 'c').map((item, index) => (
+                      <tr
+                        key={index}
+                        className="hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
+                        onClick={() => {
+                          if (item.type === 'Application' && item.id) {
+                            // Launch application
+                            const app = appConfig.taskbarApps.find((a) => a.id === item.id);
+                            if (app) {
+                              if (item.id === 'Terminal') {
+                                addWindow('Terminal', <Terminal />, 800, 500, app.icon);
+                              } else {
+                                addWindow(
+                                  item.id,
+                                  <div className="p-4 flex items-center justify-center h-full">
+                                    <div className="text-center">
+                                      <h2 className="text-xl font-semibold mb-2">{app.name}</h2>
+                                      <p className="text-sm text-gray-500">App component coming soon</p>
+                                    </div>
+                                  </div>,
+                                  800,
+                                  600,
+                                  app.icon
+                                );
+                              }
+                            }
+                          }
+                        }}
+                      >
+                        <td className="py-2 px-4 flex items-center gap-2">
+                          {item.type === 'File folder' ? (
+                            <Image
+                              src="/icons/folder/folder.png"
+                              alt={item.name}
+                              width={16}
+                              height={16}
+                              className="w-4 h-4 object-contain flex-shrink-0"
+                              unoptimized
+                            />
+                          ) : item.type === 'Application' && item.icon ? (
+                            <Image
+                              src={item.icon}
+                              alt={item.name}
+                              width={16}
+                              height={16}
+                              className="w-4 h-4 object-contain flex-shrink-0"
+                              unoptimized
+                            />
+                          ) : (
+                            <FileText className="w-4 h-4 text-gray-400" />
+                          )}
+                          <span className="text-sm text-gray-300">{item.name}</span>
+                        </td>
+                        <td className="py-2 px-4 text-sm text-gray-400">{item.dateModified}</td>
+                        <td className="py-2 px-4 text-sm text-gray-400">{item.type}</td>
+                        <td className="py-2 px-4 text-sm text-gray-400">{item.size}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : currentView === 'home' ? (
             <div className="p-2 md:p-4">
               {/* Quick Access Section */}
               <div className="mb-4">
@@ -636,9 +962,23 @@ export default function FileExplorer() {
                             unoptimized
                           />
                         ) : item.type === 'drive' ? (
-                          <HardDrive className="w-8 h-8 text-gray-400" />
+                          <Image
+                            src="/icons/drives/c.png"
+                            alt={item.name}
+                            width={32}
+                            height={32}
+                            className="w-8 h-8 object-contain"
+                            unoptimized
+                          />
                         ) : (
-                          <Folder className="w-8 h-8 text-blue-400" />
+                          <Image
+                            src={item.icon || '/icons/folder/folder.png'}
+                            alt={item.name}
+                            width={32}
+                            height={32}
+                            className="w-8 h-8 object-contain"
+                            unoptimized
+                          />
                         )}
                       </div>
                       <div className="text-center">
@@ -715,7 +1055,18 @@ export default function FileExplorer() {
                           onClick={() => handleFileClick(file)}
                         >
                           <td className="py-2 px-4 flex items-center gap-2">
-                            <Shield className="w-4 h-4 text-red-500" />
+                            {file.type === 'folder' ? (
+                              <Image
+                                src="/icons/folder/folder.png"
+                                alt={file.name}
+                                width={16}
+                                height={16}
+                                className="w-4 h-4 object-contain flex-shrink-0"
+                                unoptimized
+                              />
+                            ) : (
+                              <FileText className="w-4 h-4 text-gray-400" />
+                            )}
                             <span className="text-sm text-gray-300">{file.name}</span>
                           </td>
                           <td className="py-2 px-4 text-sm text-gray-400">
@@ -786,7 +1137,14 @@ export default function FileExplorer() {
                     >
                       <div className="w-16 h-16 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center overflow-hidden border border-[rgba(255,255,255,0.1)]">
                         {file.type === 'folder' ? (
-                          <Folder className="w-8 h-8 text-blue-400" />
+                          <Image
+                            src="/icons/folder/folder.png"
+                            alt={file.name}
+                            width={32}
+                            height={32}
+                            className="w-8 h-8 object-contain"
+                            unoptimized
+                          />
                         ) : (
                           <FileText className="w-8 h-8 text-gray-400" />
                         )}
@@ -825,7 +1183,14 @@ export default function FileExplorer() {
                       }`}
                     >
                       {file.type === 'folder' ? (
-                        <Folder className="w-5 h-5 text-blue-400" />
+                        <Image
+                          src="/icons/folder/folder.png"
+                          alt={file.name}
+                          width={20}
+                          height={20}
+                          className="w-5 h-5 object-contain flex-shrink-0"
+                          unoptimized
+                        />
                       ) : (
                         <FileText className="w-5 h-5 text-gray-400" />
                       )}
@@ -870,7 +1235,14 @@ export default function FileExplorer() {
                         >
                           <td className="py-2 px-4 flex items-center gap-2">
                             {file.type === 'folder' ? (
-                              <Folder className="w-4 h-4 text-blue-400" />
+                              <Image
+                                src="/icons/folder/folder.png"
+                                alt={file.name}
+                                width={16}
+                                height={16}
+                                className="w-4 h-4 object-contain flex-shrink-0"
+                                unoptimized
+                              />
                             ) : (
                               <FileText className="w-4 h-4 text-gray-400" />
                             )}

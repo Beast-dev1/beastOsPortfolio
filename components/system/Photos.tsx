@@ -56,7 +56,7 @@ export default function Photos() {
         <ImageViewer imageUrl={imageUrl} imageName={imageName} />,
         1000,
         700,
-        '/cursor/photos.svg'
+        '/icons/pictures/pictures.png'
       );
     },
     [addWindow]

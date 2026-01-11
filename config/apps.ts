@@ -2,10 +2,10 @@ export type AppConfig = typeof appConfig;
 
 export const appConfig = {
   taskbarApps: [
-    { name: 'File Explorer', icon: '/cursor/file-part-2-svgrepo-com.svg', id: 'FileExplorer' },
+    { name: 'File Explorer', icon: '/icons/explorer/explorer.png', id: 'FileExplorer' },
     { name: 'Mail', icon: '/cursor/mail-svgrepo-com.svg', id: 'Mail' },
     { name: 'Music', icon: '/cursor/music.svg', id: 'Music' },
-    { name: 'Photos', icon: '/cursor/photos.svg', id: 'Photos' },
+    { name: 'Photos', icon: '/icons/pictures/pictures.png', id: 'Photos' },
     { name: 'Terminal', icon: '/cursor/terminal-svgrepo-com (1).svg', id: 'Terminal' },
     { name: 'Google Chrome', icon: '/cursor/chrome.svg', id: 'GoogleChrome' },
     { name: 'About Me', icon: '/cursor/about.svg', id: 'aboutMe' },
@@ -17,7 +17,7 @@ export const appConfig = {
     { name: 'PowerPoint', icon: '/cursor/file-type-powerpoint2.svg', id: 'PowerPoint' },
     { name: 'Excel', icon: '/cursor/excel.svg', id: 'Excel' },
     { name: 'Microsoft Store', icon: '/cursor/store.svg', id: 'MicrosoftStore' },
-    { name: 'File Explorer', icon: '/cursor/file-part-2-svgrepo-com.svg', id: 'FileExplorer' },
+    { name: 'File Explorer', icon: '/icons/explorer/explorer.png', id: 'FileExplorer' },
     { name: 'Google Chrome', icon: '/cursor/chrome.svg', id: 'GoogleChrome' },
     { name: 'Google Play ', icon: '/cursor/googleplay.svg', id: 'GooglePlayBooks' },
     { name: 'WhatsApp', icon: '/cursor/whatsapp.svg', id: 'WhatsApp' },
@@ -28,7 +28,7 @@ export const appConfig = {
     { name: 'Google Drive', description: 'Recently added', icon: '/cursor/drive.svg', id: 'GoogleDrive' },
     { name: 'VMware Workstation Pro', description: 'Frequently used app', icon: '/cursor/vmware1.svg', id: 'VMware' },
     { name: 'Amazon', description: 'From your browsing history', icon: '/cursor/amazon-.svg', id: 'Amazon' },
-    { name: 'Photos', description: 'From your browsing history', icon: '/cursor/photos-brand-svgrepo-com.svg', id: 'Photos' },
+    { name: 'Photos', description: 'From your browsing history', icon: '/icons/pictures/pictures.png', id: 'Photos' },
     { name: 'Inbox (706)', description: 'From your browsing history', icon: '/cursor/terminal-svgrepo-com (1).svg', id: 'Inbox' },
     { name: 'YouTube', description: 'From your browsing history', icon: '/cursor/youtube.svg', id: 'YouTubeMusic' },
   ],
