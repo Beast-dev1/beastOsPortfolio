@@ -59,9 +59,18 @@ export const WindowProvider: React.FC<{ children: React.ReactNode }> = ({
           return prev; // Don't add a new window if it already exists
         }
 
+        // Account for taskbar height (approximately 48px)
+        const taskbarHeight = 48;
+        const availableHeight = window.innerHeight - taskbarHeight;
+        const availableWidth = window.innerWidth;
+
         // Calculate the center position
-        const centerX = (window.innerWidth - width) / 2;
-        const centerY = (window.innerHeight - height) / 2;
+        let centerX = (availableWidth - width) / 2;
+        let centerY = (availableHeight - height) / 2;
+
+        // Ensure window doesn't go off-screen - constrain position but keep original size
+        centerX = Math.max(0, Math.min(centerX, availableWidth - width));
+        centerY = Math.max(0, Math.min(centerY, availableHeight - height));
 
         const others = prev.filter((w) => w.id !== id);
         const maxZIndex = Math.min(
@@ -174,26 +183,40 @@ export const WindowProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const restoreWindow = useCallback((id: string) => {
     setWindows((prev) =>
-      prev.map((w) =>
-        w.id === id
-          ? {
-              ...w,
-              isMaximized: false,
-              isMinimized: false,
-              isVisible: true,
-              width: w.previousSize?.width || 500,
-              height: w.previousSize?.height || 500,
-              x:
-                w.previousPosition?.x !== undefined
-                  ? w.previousPosition.x
-                  : (window.innerWidth - (w.previousSize?.width || 500)) / 2,
-              y:
-                w.previousPosition?.y !== undefined
-                  ? w.previousPosition.y
-                  : (window.innerHeight - (w.previousSize?.height || 500)) / 2,
-            }
-          : w
-      )
+      prev.map((w) => {
+        if (w.id !== id) return w;
+
+        const taskbarHeight = 48;
+        const availableHeight = window.innerHeight - taskbarHeight;
+        const availableWidth = window.innerWidth;
+        const restoreWidth = w.previousSize?.width || 500;
+        const restoreHeight = w.previousSize?.height || 500;
+
+        // Calculate position, ensuring window stays within bounds
+        let restoreX =
+          w.previousPosition?.x !== undefined
+            ? w.previousPosition.x
+            : (availableWidth - restoreWidth) / 2;
+        let restoreY =
+          w.previousPosition?.y !== undefined
+            ? w.previousPosition.y
+            : (availableHeight - restoreHeight) / 2;
+
+        // Ensure window doesn't go off-screen - constrain position but keep original size
+        restoreX = Math.max(0, Math.min(restoreX, availableWidth - restoreWidth));
+        restoreY = Math.max(0, Math.min(restoreY, availableHeight - restoreHeight));
+
+        return {
+          ...w,
+          isMaximized: false,
+          isMinimized: false,
+          isVisible: true,
+          width: restoreWidth,
+          height: restoreHeight,
+          x: restoreX,
+          y: restoreY,
+        };
+      })
     );
   }, []);
 

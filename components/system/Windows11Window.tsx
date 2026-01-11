@@ -155,7 +155,17 @@ export default function Windows11Window({
       onDragStart={() => setIsDragging(true)}
       onDragStop={(_e: any, d: any) => {
         setIsDragging(false);
-        setWindowState(id, { x: d.x, y: d.y });
+        // Ensure window stays within bounds (accounting for taskbar)
+        const taskbarHeight = 48;
+        const availableHeight = window.innerHeight - taskbarHeight;
+        const availableWidth = window.innerWidth;
+        const windowWidth = typeof win.width === 'number' ? win.width : parseInt(win.width.toString()) || initialWidth;
+        const windowHeight = typeof win.height === 'number' ? win.height : parseInt(win.height.toString()) || initialHeight;
+        
+        const constrainedX = Math.max(0, Math.min(d.x, availableWidth - windowWidth));
+        const constrainedY = Math.max(0, Math.min(d.y, availableHeight - windowHeight));
+        
+        setWindowState(id, { x: constrainedX, y: constrainedY });
       }}
       onMouseDown={() => bringToFront(id)}
       onResizeStop={(_e: any, _direction: any, ref: any, _delta: any, position: any) => {

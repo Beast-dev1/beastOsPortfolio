@@ -28,6 +28,15 @@ interface Tab {
   historyIndex: number;
   isLoading: boolean;
   isNewTab: boolean;
+  // Search state for this tab
+  searchQuery?: string;
+  searchResults?: SearchResult[];
+  isSearching?: boolean;
+  searchError?: string | null;
+  currentPage?: number;
+  totalResults?: number;
+  searchTime?: number;
+  hasSearched?: boolean;
 }
 
 const GOOGLE_API_KEY = 'AIzaSyAw6utXcUhdzoqQQscBmW2ABe6feRmbplw';
@@ -74,15 +83,8 @@ export default function Chrome() {
   const [urlInput, setUrlInput] = useState<string>('');
   const iframeRefs = useRef<Map<string, HTMLIFrameElement>>(new Map());
   
-  // Search state management
+  // Search query state for new tab input (search results are stored per-tab)
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [searchError, setSearchError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalResults, setTotalResults] = useState<number>(0);
-  const [searchTime, setSearchTime] = useState<number>(0);
-  const [hasSearched, setHasSearched] = useState<boolean>(false);
 
   const activeTab = tabs.find((tab) => tab.id === activeTabId) || tabs[0];
 
@@ -93,25 +95,58 @@ export default function Chrome() {
   useEffect(() => {
     if (activeTab) {
       setUrlInput(activeTab.isNewTab ? '' : activeTab.url);
-      // Reset search state when switching to a new tab
+      // Reset search query input when switching to a new tab
       const tabSwitched = prevActiveTabIdRef.current !== activeTabId;
       if (tabSwitched && activeTab.isNewTab) {
-        setHasSearched(false);
-        setSearchResults([]);
         setSearchQuery('');
-        setCurrentPage(1);
-        setSearchError(null);
       }
       prevActiveTabIdRef.current = activeTabId;
     }
   }, [activeTab, activeTabId]);
 
-  // Perform Google Custom Search
-  const performSearch = useCallback(async (query: string, page: number = 1) => {
+  // Perform Google Custom Search - creates a new tab for search results
+  const performSearch = useCallback(async (query: string, page: number = 1, tabId?: string) => {
     if (!query.trim()) return;
 
-    setIsSearching(true);
-    setSearchError(null);
+    const targetTabId = tabId || `tab-${Date.now()}`;
+    const isNewTab = !tabId;
+
+    // If creating a new tab, create it first
+    if (isNewTab) {
+      const newTab: Tab = {
+        id: targetTabId,
+        url: '',
+        title: `Search: ${query}`,
+        history: [],
+        historyIndex: -1,
+        isLoading: false,
+        isNewTab: false,
+        searchQuery: query,
+        searchResults: [],
+        isSearching: true,
+        searchError: null,
+        currentPage: page,
+        totalResults: 0,
+        searchTime: 0,
+        hasSearched: false,
+      };
+      setTabs((prev) => [...prev, newTab]);
+      setActiveTabId(targetTabId);
+    } else {
+      // Update existing tab's search state
+      setTabs((prev) =>
+        prev.map((tab) =>
+          tab.id === targetTabId
+            ? {
+                ...tab,
+                isSearching: true,
+                searchError: null,
+              }
+            : tab
+        )
+      );
+    }
+
     const startIndex = (page - 1) * 10 + 1;
 
     try {
@@ -129,29 +164,59 @@ export default function Chrome() {
         throw new Error(data.error.message || 'Search API error');
       }
 
-      setSearchResults(data.items || []);
-      setTotalResults(parseInt(data.searchInformation?.totalResults || '0', 10));
-      setSearchTime(data.searchInformation?.searchTime || 0);
-      setHasSearched(true);
-      setCurrentPage(page);
-      setSearchQuery(query);
+      const results = data.items || [];
+      const total = parseInt(data.searchInformation?.totalResults || '0', 10);
+      const time = data.searchInformation?.searchTime || 0;
+
+      // Update tab with search results
+      setTabs((prev) =>
+        prev.map((tab) =>
+          tab.id === targetTabId
+            ? {
+                ...tab,
+                searchQuery: query,
+                searchResults: results,
+                totalResults: total,
+                searchTime: time,
+                hasSearched: true,
+                currentPage: page,
+                isSearching: false,
+                searchError: null,
+                title: `Search: ${query}`,
+              }
+            : tab
+        )
+      );
     } catch (error) {
       console.error('Search error:', error);
-      setSearchError(
-        error instanceof Error ? error.message : 'An error occurred while searching. Please try again.'
+      const errorMessage =
+        error instanceof Error ? error.message : 'An error occurred while searching. Please try again.';
+
+      // Update tab with error
+      setTabs((prev) =>
+        prev.map((tab) =>
+          tab.id === targetTabId
+            ? {
+                ...tab,
+                isSearching: false,
+                searchError: errorMessage,
+                searchResults: [],
+              }
+            : tab
+        )
       );
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
     }
   }, []);
 
-  // Handle search submit
+  // Handle search submit - creates new tab for results
   const handleSearchSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      if (searchQuery.trim()) {
-        performSearch(searchQuery.trim(), 1);
+      const query = searchQuery.trim();
+      if (query) {
+        performSearch(query, 1);
+        // Reset search query in the new tab view
+        setSearchQuery('');
       }
     },
     [searchQuery, performSearch]
@@ -164,18 +229,40 @@ export default function Chrome() {
 
   // Handle pagination
   const handleNextPage = useCallback(() => {
-    if (searchQuery.trim() && currentPage * 10 < totalResults) {
-      performSearch(searchQuery.trim(), currentPage + 1);
+    const tab = tabs.find((t) => t.id === activeTabId);
+    if (tab?.searchQuery?.trim() && tab.currentPage && tab.totalResults && tab.currentPage * 10 < tab.totalResults) {
+      performSearch(tab.searchQuery.trim(), tab.currentPage + 1, activeTabId);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [searchQuery, currentPage, totalResults, performSearch]);
+  }, [tabs, activeTabId, performSearch]);
 
   const handlePrevPage = useCallback(() => {
-    if (searchQuery.trim() && currentPage > 1) {
-      performSearch(searchQuery.trim(), currentPage - 1);
+    const tab = tabs.find((t) => t.id === activeTabId);
+    if (tab?.searchQuery?.trim() && tab.currentPage && tab.currentPage > 1) {
+      performSearch(tab.searchQuery.trim(), tab.currentPage - 1, activeTabId);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [searchQuery, currentPage, performSearch]);
+  }, [tabs, activeTabId, performSearch]);
+
+  // Handle search result click - open in new tab
+  const handleResultClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, url: string, title: string) => {
+      e.preventDefault();
+      const newTabId = `tab-${Date.now()}`;
+      const newTab: Tab = {
+        id: newTabId,
+        url: url,
+        title: title,
+        history: [url],
+        historyIndex: 0,
+        isLoading: true,
+        isNewTab: false,
+      };
+      setTabs((prev) => [...prev, newTab]);
+      setActiveTabId(newTabId);
+    },
+    []
+  );
 
   // Create new tab
   const createNewTab = useCallback(() => {
@@ -243,46 +330,110 @@ export default function Chrome() {
   const handleUrlSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      navigateToUrl(urlInput);
+      // Use searchQuery when on new tab, urlInput otherwise
+      const inputValue = (activeTab.isNewTab ? searchQuery : urlInput).trim();
+      if (!inputValue) return;
+
+      // Check if input looks like a URL (has protocol, or contains dots/slashes that suggest a domain)
+      const looksLikeUrl = 
+        /^https?:\/\//i.test(inputValue) || // Has protocol
+        (inputValue.includes('.') && !inputValue.includes(' ')) || // Contains dot and no spaces (likely domain)
+        /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(inputValue); // Looks like domain.tld format
+
+      // If it doesn't look like a URL, treat it as a search query - create new tab
+      if (!looksLikeUrl) {
+        performSearch(inputValue, 1);
+        // Reset search query in the new tab view
+        if (activeTab.isNewTab) {
+          setSearchQuery('');
+        }
+        return;
+      }
+
+      // If it looks like a URL, validate and normalize it
+      const normalized = validateAndNormalizeUrl(inputValue);
+      if (normalized) {
+        navigateToUrl(normalized);
+      } else {
+        // If validation fails, treat as search query - create new tab
+        performSearch(inputValue, 1);
+        if (activeTab.isNewTab) {
+          setSearchQuery('');
+        }
+      }
     },
-    [urlInput, navigateToUrl]
+    [urlInput, navigateToUrl, activeTab.isNewTab, performSearch, searchQuery]
   );
 
-  // Navigate back
+  // Navigate back - close current tab and go to previous tab
   const navigateBack = useCallback(() => {
-    setTabs((prev) =>
-      prev.map((tab) => {
-        if (tab.id === activeTabId && tab.historyIndex > 0) {
-          const newIndex = tab.historyIndex - 1;
-          return {
-            ...tab,
-            url: tab.history[newIndex],
-            historyIndex: newIndex,
-            isLoading: true,
-          };
-        }
-        return tab;
-      })
-    );
-  }, [activeTabId]);
+    if (tabs.length <= 1) {
+      // If it's the last tab, create a new one instead of closing
+      createNewTab();
+      return;
+    }
+    
+    const currentIndex = tabs.findIndex((tab) => tab.id === activeTabId);
+    if (currentIndex <= 0) return; // Already at first tab
+    
+    const previousTab = tabs[currentIndex - 1];
+    
+    // Close current tab and switch to previous tab
+    setTabs((prev) => {
+      const filtered = prev.filter((tab) => tab.id !== activeTabId);
+      // Ensure we always have at least one tab
+      if (filtered.length === 0) {
+        const newTab = {
+          id: `tab-${Date.now()}`,
+          url: '',
+          title: 'New Tab',
+          history: [],
+          historyIndex: -1,
+          isLoading: false,
+          isNewTab: true,
+        };
+        setActiveTabId(newTab.id);
+        return [newTab];
+      }
+      return filtered;
+    });
+    setActiveTabId(previousTab.id);
+  }, [activeTabId, tabs, createNewTab]);
 
-  // Navigate forward
+  // Navigate forward - close current tab and go to next tab
   const navigateForward = useCallback(() => {
-    setTabs((prev) =>
-      prev.map((tab) => {
-        if (tab.id === activeTabId && tab.historyIndex < tab.history.length - 1) {
-          const newIndex = tab.historyIndex + 1;
-          return {
-            ...tab,
-            url: tab.history[newIndex],
-            historyIndex: newIndex,
-            isLoading: true,
-          };
-        }
-        return tab;
-      })
-    );
-  }, [activeTabId]);
+    if (tabs.length <= 1) {
+      // If it's the last tab, create a new one instead of closing
+      createNewTab();
+      return;
+    }
+    
+    const currentIndex = tabs.findIndex((tab) => tab.id === activeTabId);
+    if (currentIndex >= tabs.length - 1) return; // Already at last tab
+    
+    const nextTab = tabs[currentIndex + 1];
+    
+    // Close current tab and switch to next tab
+    setTabs((prev) => {
+      const filtered = prev.filter((tab) => tab.id !== activeTabId);
+      // Ensure we always have at least one tab
+      if (filtered.length === 0) {
+        const newTab = {
+          id: `tab-${Date.now()}`,
+          url: '',
+          title: 'New Tab',
+          history: [],
+          historyIndex: -1,
+          isLoading: false,
+          isNewTab: true,
+        };
+        setActiveTabId(newTab.id);
+        return [newTab];
+      }
+      return filtered;
+    });
+    setActiveTabId(nextTab.id);
+  }, [activeTabId, tabs, createNewTab]);
 
   // Refresh page
   const refreshPage = useCallback(() => {
@@ -353,9 +504,9 @@ export default function Chrome() {
   );
 
   return (
-    <div className="w-full h-full flex flex-col bg-white overflow-hidden">
+    <div className="w-full h-full flex flex-col bg-white" style={{ height: '100%', minHeight: 0, maxHeight: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* Title Bar - Green */}
-      <div className="h-8 bg-[#1e7e34] flex items-center justify-between px-1 md:px-2 overflow-x-auto scrollbar-hide">
+      <div className="h-8 bg-[#1e7e34] flex items-center justify-between px-1 md:px-2 overflow-x-auto scrollbar-hide flex-shrink-0">
         <div className="flex items-center gap-0.5 md:gap-1 min-w-0">
           {tabs.map((tab) => (
             <motion.div
@@ -404,22 +555,22 @@ export default function Chrome() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-0.5 md:gap-1 px-1 md:px-2 py-1 bg-white border-b border-gray-200">
+      <div className="flex items-center gap-0.5 md:gap-1 px-1 md:px-2 py-1 bg-white border-b border-gray-200 flex-shrink-0">
         {/* Navigation Buttons */}
         <div className="flex items-center gap-0 md:gap-0.5 flex-shrink-0">
           <button
             className="p-1 md:p-1.5 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             onClick={navigateBack}
-            disabled={activeTab.historyIndex < 0}
-            title="Back"
+            disabled={tabs.length <= 1 || tabs.findIndex((tab) => tab.id === activeTabId) <= 0}
+            title="Back (Close tab and go to previous)"
           >
             <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-700" />
           </button>
           <button
             className="p-1 md:p-1.5 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             onClick={navigateForward}
-            disabled={activeTab.historyIndex >= activeTab.history.length - 1}
-            title="Forward"
+            disabled={tabs.length <= 1 || tabs.findIndex((tab) => tab.id === activeTabId) >= tabs.length - 1}
+            title="Forward (Close tab and go to next)"
           >
             <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-700" />
           </button>
@@ -440,8 +591,15 @@ export default function Chrome() {
             <Search className="absolute left-2 md:left-3 w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400 pointer-events-none" />
             <input
               type="text"
-              value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
+              value={activeTab.isNewTab ? searchQuery : urlInput}
+              onChange={(e) => {
+                if (activeTab.isNewTab) {
+                  setSearchQuery(e.target.value);
+                  setUrlInput(e.target.value);
+                } else {
+                  setUrlInput(e.target.value);
+                }
+              }}
               className="w-full px-8 md:px-10 py-1 md:py-1.5 text-xs md:text-sm text-gray-800 focus:outline-none"
               placeholder={activeTab.isNewTab ? "Search Google or type a URL" : activeTab.url}
             />
@@ -473,203 +631,158 @@ export default function Chrome() {
             className={`absolute inset-0 ${tab.id === activeTabId ? 'z-10' : 'z-0'}`}
             style={{ display: tab.id === activeTabId ? 'block' : 'none' }}
           >
-            {tab.isNewTab || !tab.url ? (
+            {tab.hasSearched ? (
+              // Search Results View - Only Results, No Logo or Search Bar
               <div className="w-full h-full flex flex-col bg-white overflow-y-auto">
-                {!hasSearched ? (
-                  // New Tab View - Search Homepage
-                  <div className="flex flex-col items-center justify-start pt-16 md:pt-[120px] px-4 flex-1">
-                    {/* Google Logo */}
-                    <div className="mb-4 md:mb-8">
-                      <div className="text-[48px] md:text-[90px] font-normal tracking-tight leading-none" style={{ fontFamily: 'Arial, sans-serif' }}>
-                        <span className="text-[#4285F4]">G</span>
-                        <span className="text-[#EA4335]">o</span>
-                        <span className="text-[#FBBC05]">o</span>
-                        <span className="text-[#4285F4]">g</span>
-                        <span className="text-[#34A853]">l</span>
-                        <span className="text-[#EA4335]">e</span>
+                <div className="w-full max-w-[652px] mx-auto pt-4 md:pt-6 px-4 md:px-6 pb-8">
+                  {/* Results Info */}
+                  {tab.totalResults && tab.totalResults > 0 && (
+                    <div className="mb-3 text-xs md:text-sm text-[#5f6368]" style={{ fontFamily: 'Arial, sans-serif' }}>
+                      About {tab.totalResults.toLocaleString()} results ({tab.searchTime?.toFixed(2) || '0'} seconds)
+                    </div>
+                  )}
+
+                  {/* Error Message */}
+                  {tab.searchError && (
+                    <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded text-red-800 text-sm" style={{ fontFamily: 'Arial, sans-serif' }}>
+                      {tab.searchError}
+                    </div>
+                  )}
+
+                  {/* Loading State */}
+                  {tab.isSearching && (!tab.searchResults || tab.searchResults.length === 0) && (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="flex flex-col items-center gap-3">
+                        <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+                        <span className="text-sm text-gray-500" style={{ fontFamily: 'Arial, sans-serif' }}>Searching...</span>
                       </div>
                     </div>
-                    
-                    {/* Custom Search Bar */}
-                    <form onSubmit={handleSearchSubmit} className="w-full max-w-[584px] mb-4 md:mb-6">
-                      <div className="relative flex items-center">
-                        <Search className="absolute left-4 md:left-5 w-4 h-4 md:w-5 md:h-5 text-gray-400 pointer-events-none" />
-                        <input
-                          type="text"
-                          value={searchQuery}
-                          onChange={handleSearchInputChange}
-                          className="w-full h-11 md:h-[44px] pl-10 md:pl-12 pr-10 md:pr-12 text-sm md:text-base text-gray-800 rounded-full border border-[#dfe1e5] focus:outline-none focus:shadow-md focus:border-transparent hover:shadow-md transition-shadow"
-                          style={{ fontFamily: 'Arial, sans-serif' }}
-                          placeholder="Search Google or type a URL"
-                        />
-                        {isSearching && (
-                          <RefreshCw className="absolute right-4 md:right-5 w-4 h-4 md:w-5 md:h-5 text-gray-400 animate-spin" />
-                        )}
-                      </div>
-                    </form>
-                    
-                    {/* Search Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-2 md:gap-3 w-full max-w-[584px] mb-4 md:mb-8">
-                      <button
-                        onClick={handleSearchSubmit}
-                        disabled={!searchQuery.trim() || isSearching}
-                        className="px-4 py-2 bg-[#f8f9fa] text-xs md:text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{ fontFamily: 'Arial, sans-serif' }}
-                      >
-                        Google Search
-                      </button>
-                      <button className="px-4 py-2 bg-[#f8f9fa] text-xs md:text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all" style={{ fontFamily: 'Arial, sans-serif' }}>
-                        I'm Feeling Lucky
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  // Search Results View
-                  <div className="w-full max-w-[652px] mx-auto pt-4 md:pt-6 px-4 md:px-6 pb-8">
-                    {/* Search Bar at Top */}
-                    <div className="mb-4 md:mb-6">
-                      <form onSubmit={handleSearchSubmit} className="relative">
-                        <div className="flex items-center">
-                          <a
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setHasSearched(false);
-                              setSearchResults([]);
-                              setSearchQuery('');
-                              setCurrentPage(1);
-                            }}
-                            className="mr-3 md:mr-4"
-                          >
-                            <div className="text-[32px] md:text-[90px] font-normal tracking-tight leading-none" style={{ fontFamily: 'Arial, sans-serif' }}>
-                              <span className="text-[#4285F4]">G</span>
-                              <span className="text-[#EA4335]">o</span>
-                              <span className="text-[#FBBC05]">o</span>
-                              <span className="text-[#4285F4]">g</span>
-                              <span className="text-[#34A853]">l</span>
-                              <span className="text-[#EA4335]">e</span>
-                            </div>
-                          </a>
-                          <div className="flex-1 relative flex items-center">
-                            <Search className="absolute left-3 md:left-4 w-4 h-4 md:w-5 md:h-5 text-gray-400 pointer-events-none" />
-                            <input
-                              type="text"
-                              value={searchQuery}
-                              onChange={handleSearchInputChange}
-                              className="w-full h-9 md:h-[44px] pl-9 md:pl-12 pr-9 md:pr-12 text-sm md:text-base text-gray-800 rounded-full border border-[#dfe1e5] focus:outline-none focus:shadow-md focus:border-transparent hover:shadow-md transition-shadow"
-                              style={{ fontFamily: 'Arial, sans-serif' }}
-                            />
-                            {isSearching && (
-                              <RefreshCw className="absolute right-3 md:right-4 w-4 h-4 md:w-5 md:h-5 text-gray-400 animate-spin" />
+                  )}
+
+                  {/* Search Results */}
+                  {!tab.isSearching && tab.searchResults && tab.searchResults.length > 0 && (
+                    <div className="space-y-6 md:space-y-8">
+                      {tab.searchResults.map((result, index) => {
+                        const thumbnail = result.pagemap?.cse_image?.[0]?.src;
+                        return (
+                          <div key={index} className="flex gap-3 md:gap-4">
+                            {thumbnail && (
+                              <div className="flex-shrink-0">
+                                <img
+                                  src={thumbnail}
+                                  alt=""
+                                  className="w-16 h-16 md:w-20 md:h-20 object-cover rounded border border-gray-200"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                  }}
+                                />
+                              </div>
                             )}
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-
-                    {/* Results Info */}
-                    {totalResults > 0 && (
-                      <div className="mb-3 text-xs md:text-sm text-[#5f6368]" style={{ fontFamily: 'Arial, sans-serif' }}>
-                        About {totalResults.toLocaleString()} results ({searchTime.toFixed(2)} seconds)
-                      </div>
-                    )}
-
-                    {/* Error Message */}
-                    {searchError && (
-                      <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded text-red-800 text-sm" style={{ fontFamily: 'Arial, sans-serif' }}>
-                        {searchError}
-                      </div>
-                    )}
-
-                    {/* Loading State */}
-                    {isSearching && searchResults.length === 0 && (
-                      <div className="flex items-center justify-center py-12">
-                        <div className="flex flex-col items-center gap-3">
-                          <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
-                          <span className="text-sm text-gray-500" style={{ fontFamily: 'Arial, sans-serif' }}>Searching...</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Search Results */}
-                    {!isSearching && searchResults.length > 0 && (
-                      <div className="space-y-6 md:space-y-8">
-                        {searchResults.map((result, index) => {
-                          const thumbnail = result.pagemap?.cse_image?.[0]?.src;
-                          return (
-                            <div key={index} className="flex gap-3 md:gap-4">
-                              {thumbnail && (
-                                <div className="flex-shrink-0">
-                                  <img
-                                    src={thumbnail}
-                                    alt=""
-                                    className="w-16 h-16 md:w-20 md:h-20 object-cover rounded border border-gray-200"
-                                    onError={(e) => {
-                                      (e.target as HTMLImageElement).style.display = 'none';
-                                    }}
-                                  />
-                                </div>
-                              )}
-                              <div className="flex-1 min-w-0">
-                                <div className="mb-1">
-                                  <a
-                                    href={result.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-lg md:text-xl text-[#1a0dab] hover:underline cursor-pointer visited:text-[#681da8]"
-                                    style={{ fontFamily: 'Arial, sans-serif' }}
-                                  >
-                                    {result.title}
-                                  </a>
-                                </div>
-                                <div className="mb-1 text-xs md:text-sm text-[#006621]" style={{ fontFamily: 'Arial, sans-serif' }}>
-                                  {result.displayLink}
-                                </div>
-                                <div className="text-sm text-[#4d5156] leading-relaxed" style={{ fontFamily: 'Arial, sans-serif' }}>
-                                  {result.snippet}
-                                </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="mb-1">
+                                <a
+                                  href={result.link}
+                                  onClick={(e) => handleResultClick(e, result.link, result.title)}
+                                  className="text-lg md:text-xl text-[#1a0dab] hover:underline cursor-pointer visited:text-[#681da8]"
+                                  style={{ fontFamily: 'Arial, sans-serif' }}
+                                >
+                                  {result.title}
+                                </a>
+                              </div>
+                              <div className="mb-1 text-xs md:text-sm text-[#006621]" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                {result.displayLink}
+                              </div>
+                              <div className="text-sm text-[#4d5156] leading-relaxed" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                {result.snippet}
                               </div>
                             </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
 
-                    {/* No Results */}
-                    {!isSearching && !searchError && searchResults.length === 0 && hasSearched && (
-                      <div className="text-center py-12">
-                        <div className="text-gray-500 text-base" style={{ fontFamily: 'Arial, sans-serif' }}>
-                          No results found for "{searchQuery}"
-                        </div>
+                  {/* No Results */}
+                  {!tab.isSearching && !tab.searchError && (!tab.searchResults || tab.searchResults.length === 0) && tab.hasSearched && (
+                    <div className="text-center py-12">
+                      <div className="text-gray-500 text-base" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        No results found for "{tab.searchQuery}"
                       </div>
-                    )}
+                    </div>
+                  )}
 
-                    {/* Pagination */}
-                    {!isSearching && searchResults.length > 0 && (
-                      <div className="mt-8 md:mt-10 flex items-center justify-center gap-4">
-                        <button
-                          onClick={handlePrevPage}
-                          disabled={currentPage === 1}
-                          className="px-4 py-2 bg-[#f8f9fa] text-sm text-[#3c4043] rounded border border-[#dadce0] hover:border-gray-300 hover:shadow-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                          style={{ fontFamily: 'Arial, sans-serif' }}
-                        >
-                          Previous
-                        </button>
-                        <div className="text-sm text-[#5f6368]" style={{ fontFamily: 'Arial, sans-serif' }}>
-                          Page {currentPage}
-                        </div>
-                        <button
-                          onClick={handleNextPage}
-                          disabled={currentPage * 10 >= totalResults}
-                          className="px-4 py-2 bg-[#f8f9fa] text-sm text-[#3c4043] rounded border border-[#dadce0] hover:border-gray-300 hover:shadow-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                          style={{ fontFamily: 'Arial, sans-serif' }}
-                        >
-                          Next
-                        </button>
+                  {/* Pagination */}
+                  {!tab.isSearching && tab.searchResults && tab.searchResults.length > 0 && tab.currentPage && tab.totalResults && (
+                    <div className="mt-8 md:mt-10 flex items-center justify-center gap-4">
+                      <button
+                        onClick={handlePrevPage}
+                        disabled={tab.currentPage === 1}
+                        className="px-4 py-2 bg-[#f8f9fa] text-sm text-[#3c4043] rounded border border-[#dadce0] hover:border-gray-300 hover:shadow-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                        style={{ fontFamily: 'Arial, sans-serif' }}
+                      >
+                        Previous
+                      </button>
+                      <div className="text-sm text-[#5f6368]" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        Page {tab.currentPage}
                       </div>
-                    )}
+                      <button
+                        onClick={handleNextPage}
+                        disabled={tab.currentPage * 10 >= tab.totalResults}
+                        className="px-4 py-2 bg-[#f8f9fa] text-sm text-[#3c4043] rounded border border-[#dadce0] hover:border-gray-300 hover:shadow-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                        style={{ fontFamily: 'Arial, sans-serif' }}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : tab.isNewTab || !tab.url ? (
+              // New Tab View - Search Homepage
+              <div className="w-full h-full flex flex-col bg-white overflow-y-auto">
+                <div className="flex flex-col items-center justify-start pt-16 md:pt-[120px] px-4 flex-1">
+                  {/* Google Logo */}
+                  <div className="mb-4 md:mb-8">
+                    <div className="text-[48px] md:text-[90px] font-normal tracking-tight leading-none" style={{ fontFamily: 'Arial, sans-serif' }}>
+                      <span className="text-[#4285F4]">G</span>
+                      <span className="text-[#EA4335]">o</span>
+                      <span className="text-[#FBBC05]">o</span>
+                      <span className="text-[#4285F4]">g</span>
+                      <span className="text-[#34A853]">l</span>
+                      <span className="text-[#EA4335]">e</span>
+                    </div>
                   </div>
-                )}
+                  
+                  {/* Custom Search Bar */}
+                  <form onSubmit={handleSearchSubmit} className="w-full max-w-[584px] mb-4 md:mb-6">
+                    <div className="relative flex items-center">
+                      <Search className="absolute left-4 md:left-5 w-4 h-4 md:w-5 md:h-5 text-gray-400 pointer-events-none" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={handleSearchInputChange}
+                        className="w-full h-11 md:h-[44px] pl-10 md:pl-12 pr-10 md:pr-12 text-sm md:text-base text-gray-800 rounded-full border border-[#dfe1e5] focus:outline-none focus:shadow-md focus:border-transparent hover:shadow-md transition-shadow"
+                        style={{ fontFamily: 'Arial, sans-serif' }}
+                        placeholder="Search Google or type a URL"
+                      />
+                    </div>
+                  </form>
+                  
+                  {/* Search Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-2 md:gap-3 w-full max-w-[584px] mb-4 md:mb-8">
+                    <button
+                      onClick={handleSearchSubmit}
+                      disabled={!searchQuery.trim()}
+                      className="px-4 py-2 bg-[#f8f9fa] text-xs md:text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ fontFamily: 'Arial, sans-serif' }}
+                    >
+                      Google Search
+                    </button>
+                    <button className="px-4 py-2 bg-[#f8f9fa] text-xs md:text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all" style={{ fontFamily: 'Arial, sans-serif' }}>
+                      I'm Feeling Lucky
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="w-full h-full">
