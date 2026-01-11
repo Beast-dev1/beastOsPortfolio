@@ -30,7 +30,33 @@ interface Tab {
   isNewTab: boolean;
 }
 
-const GOOGLE_CSE_ID = '860b9ebedfe00480b';
+const GOOGLE_API_KEY = 'AIzaSyAw6utXcUhdzoqQQscBmW2ABe6feRmbplw';
+const GOOGLE_CX_ID = '27e69eaf2dd014810';
+
+interface SearchResult {
+  title: string;
+  link: string;
+  displayLink: string;
+  snippet: string;
+  pagemap?: {
+    cse_image?: Array<{ src: string }>;
+  };
+}
+
+interface SearchResponse {
+  items?: SearchResult[];
+  searchInformation?: {
+    totalResults: string;
+    searchTime: number;
+  };
+  queries?: {
+    request?: Array<{ startIndex: number }>;
+  };
+  error?: {
+    message: string;
+    code: number;
+  };
+}
 
 export default function Chrome() {
   const [tabs, setTabs] = useState<Tab[]>([
@@ -47,76 +73,109 @@ export default function Chrome() {
   const [activeTabId, setActiveTabId] = useState<string>('tab-1');
   const [urlInput, setUrlInput] = useState<string>('');
   const iframeRefs = useRef<Map<string, HTMLIFrameElement>>(new Map());
-  const cseLoadedRef = useRef<boolean>(false);
+  
+  // Search state management
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalResults, setTotalResults] = useState<number>(0);
+  const [searchTime, setSearchTime] = useState<number>(0);
+  const [hasSearched, setHasSearched] = useState<boolean>(false);
 
   const activeTab = tabs.find((tab) => tab.id === activeTabId) || tabs[0];
 
-  // Load Google CSE script and add custom styles
-  useEffect(() => {
-    if (!cseLoadedRef.current && typeof window !== 'undefined') {
-      const script = document.createElement('script');
-      script.src = `https://cse.google.com/cse.js?cx=${GOOGLE_CSE_ID}`;
-      script.async = true;
-      document.body.appendChild(script);
-      cseLoadedRef.current = true;
-
-      // Add custom styles for Google CSE to match Google's design
-      const style = document.createElement('style');
-      style.textContent = `
-        .gsc-control-cse {
-          padding: 0 !important;
-          border: none !important;
-          background: transparent !important;
-        }
-        .gsc-search-box {
-          margin: 0 !important;
-        }
-        .gsc-input-box {
-          border: 1px solid #dfe1e5 !important;
-          border-radius: 24px !important;
-          box-shadow: 0 2px 5px 1px rgba(64,60,67,.16) !important;
-          height: 44px !important;
-          padding: 0 16px !important;
-          background: white !important;
-        }
-        .gsc-input-box:hover {
-          box-shadow: 0 2px 8px 1px rgba(64,60,67,.24) !important;
-        }
-        .gsc-input-box:focus-within {
-          box-shadow: 0 2px 8px 1px rgba(64,60,67,.24) !important;
-          border-color: transparent !important;
-        }
-        .gsc-input {
-          font-size: 16px !important;
-          padding: 0 !important;
-          height: 100% !important;
-        }
-        .gsib_a {
-          padding: 0 !important;
-        }
-        .gsc-search-button {
-          display: none !important;
-        }
-        .gsc-results-wrapper-overlay {
-          border: 1px solid #dfe1e5 !important;
-          border-radius: 8px !important;
-          box-shadow: 0 2px 8px 1px rgba(64,60,67,.24) !important;
-          margin-top: 8px !important;
-        }
-        .gsc-results {
-          padding: 0 !important;
-        }
-      `;
-      document.head.appendChild(style);
-    }
-  }, []);
+  // Track previous active tab to detect tab switches
+  const prevActiveTabIdRef = useRef<string>(activeTabId);
 
   // Update URL input when active tab changes
   useEffect(() => {
     if (activeTab) {
       setUrlInput(activeTab.isNewTab ? '' : activeTab.url);
+      // Reset search state when switching to a new tab
+      const tabSwitched = prevActiveTabIdRef.current !== activeTabId;
+      if (tabSwitched && activeTab.isNewTab) {
+        setHasSearched(false);
+        setSearchResults([]);
+        setSearchQuery('');
+        setCurrentPage(1);
+        setSearchError(null);
+      }
+      prevActiveTabIdRef.current = activeTabId;
     }
-  }, [activeTab]);
+  }, [activeTab, activeTabId]);
+
+  // Perform Google Custom Search
+  const performSearch = useCallback(async (query: string, page: number = 1) => {
+    if (!query.trim()) return;
+
+    setIsSearching(true);
+    setSearchError(null);
+    const startIndex = (page - 1) * 10 + 1;
+
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_CX_ID}&q=${encodeURIComponent(query)}&start=${startIndex}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Search failed: ${response.statusText}`);
+      }
+
+      const data: SearchResponse = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error.message || 'Search API error');
+      }
+
+      setSearchResults(data.items || []);
+      setTotalResults(parseInt(data.searchInformation?.totalResults || '0', 10));
+      setSearchTime(data.searchInformation?.searchTime || 0);
+      setHasSearched(true);
+      setCurrentPage(page);
+      setSearchQuery(query);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchError(
+        error instanceof Error ? error.message : 'An error occurred while searching. Please try again.'
+      );
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Handle search submit
+  const handleSearchSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (searchQuery.trim()) {
+        performSearch(searchQuery.trim(), 1);
+      }
+    },
+    [searchQuery, performSearch]
+  );
+
+  // Handle search input change
+  const handleSearchInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  // Handle pagination
+  const handleNextPage = useCallback(() => {
+    if (searchQuery.trim() && currentPage * 10 < totalResults) {
+      performSearch(searchQuery.trim(), currentPage + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [searchQuery, currentPage, totalResults, performSearch]);
+
+  const handlePrevPage = useCallback(() => {
+    if (searchQuery.trim() && currentPage > 1) {
+      performSearch(searchQuery.trim(), currentPage - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [searchQuery, currentPage, performSearch]);
 
   // Create new tab
   const createNewTab = useCallback(() => {
@@ -415,38 +474,202 @@ export default function Chrome() {
             style={{ display: tab.id === activeTabId ? 'block' : 'none' }}
           >
             {tab.isNewTab || !tab.url ? (
-              <div className="w-full h-full flex flex-col items-center justify-start pt-16 md:pt-[120px] bg-white overflow-y-auto px-4">
-                {/* Google Logo */}
-                <div className="mb-4 md:mb-8">
-                  <div className="text-[48px] md:text-[90px] font-normal tracking-tight leading-none">
-                    <span className="text-[#4285F4]">G</span>
-                    <span className="text-[#EA4335]">o</span>
-                    <span className="text-[#FBBC05]">o</span>
-                    <span className="text-[#4285F4]">g</span>
-                    <span className="text-[#34A853]">l</span>
-                    <span className="text-[#EA4335]">e</span>
+              <div className="w-full h-full flex flex-col bg-white overflow-y-auto">
+                {!hasSearched ? (
+                  // New Tab View - Search Homepage
+                  <div className="flex flex-col items-center justify-start pt-16 md:pt-[120px] px-4 flex-1">
+                    {/* Google Logo */}
+                    <div className="mb-4 md:mb-8">
+                      <div className="text-[48px] md:text-[90px] font-normal tracking-tight leading-none" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        <span className="text-[#4285F4]">G</span>
+                        <span className="text-[#EA4335]">o</span>
+                        <span className="text-[#FBBC05]">o</span>
+                        <span className="text-[#4285F4]">g</span>
+                        <span className="text-[#34A853]">l</span>
+                        <span className="text-[#EA4335]">e</span>
+                      </div>
+                    </div>
+                    
+                    {/* Custom Search Bar */}
+                    <form onSubmit={handleSearchSubmit} className="w-full max-w-[584px] mb-4 md:mb-6">
+                      <div className="relative flex items-center">
+                        <Search className="absolute left-4 md:left-5 w-4 h-4 md:w-5 md:h-5 text-gray-400 pointer-events-none" />
+                        <input
+                          type="text"
+                          value={searchQuery}
+                          onChange={handleSearchInputChange}
+                          className="w-full h-11 md:h-[44px] pl-10 md:pl-12 pr-10 md:pr-12 text-sm md:text-base text-gray-800 rounded-full border border-[#dfe1e5] focus:outline-none focus:shadow-md focus:border-transparent hover:shadow-md transition-shadow"
+                          style={{ fontFamily: 'Arial, sans-serif' }}
+                          placeholder="Search Google or type a URL"
+                        />
+                        {isSearching && (
+                          <RefreshCw className="absolute right-4 md:right-5 w-4 h-4 md:w-5 md:h-5 text-gray-400 animate-spin" />
+                        )}
+                      </div>
+                    </form>
+                    
+                    {/* Search Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-2 md:gap-3 w-full max-w-[584px] mb-4 md:mb-8">
+                      <button
+                        onClick={handleSearchSubmit}
+                        disabled={!searchQuery.trim() || isSearching}
+                        className="px-4 py-2 bg-[#f8f9fa] text-xs md:text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ fontFamily: 'Arial, sans-serif' }}
+                      >
+                        Google Search
+                      </button>
+                      <button className="px-4 py-2 bg-[#f8f9fa] text-xs md:text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        I'm Feeling Lucky
+                      </button>
+                    </div>
                   </div>
-                </div>
-                
-                {/* Google CSE Search Bar */}
-                <div className="w-full max-w-[584px] mb-4 md:mb-6">
-                  <div className="gcse-searchbox-only" data-gname="searchresults"></div>
-                </div>
-                
-                {/* Search Buttons */}
-                <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mb-4 md:mb-8 w-full max-w-[584px]">
-                  <button className="px-4 py-2 bg-[#f8f9fa] text-xs md:text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all">
-                    Google Search
-                  </button>
-                  <button className="px-4 py-2 bg-[#f8f9fa] text-xs md:text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all">
-                    I'm Feeling Lucky
-                  </button>
-                </div>
-                
-                {/* Search Results Container */}
-                <div className="w-full max-w-[652px] pb-4 md:pb-8">
-                  <div className="gcse-searchresults-only" data-gname="searchresults"></div>
-                </div>
+                ) : (
+                  // Search Results View
+                  <div className="w-full max-w-[652px] mx-auto pt-4 md:pt-6 px-4 md:px-6 pb-8">
+                    {/* Search Bar at Top */}
+                    <div className="mb-4 md:mb-6">
+                      <form onSubmit={handleSearchSubmit} className="relative">
+                        <div className="flex items-center">
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setHasSearched(false);
+                              setSearchResults([]);
+                              setSearchQuery('');
+                              setCurrentPage(1);
+                            }}
+                            className="mr-3 md:mr-4"
+                          >
+                            <div className="text-[32px] md:text-[90px] font-normal tracking-tight leading-none" style={{ fontFamily: 'Arial, sans-serif' }}>
+                              <span className="text-[#4285F4]">G</span>
+                              <span className="text-[#EA4335]">o</span>
+                              <span className="text-[#FBBC05]">o</span>
+                              <span className="text-[#4285F4]">g</span>
+                              <span className="text-[#34A853]">l</span>
+                              <span className="text-[#EA4335]">e</span>
+                            </div>
+                          </a>
+                          <div className="flex-1 relative flex items-center">
+                            <Search className="absolute left-3 md:left-4 w-4 h-4 md:w-5 md:h-5 text-gray-400 pointer-events-none" />
+                            <input
+                              type="text"
+                              value={searchQuery}
+                              onChange={handleSearchInputChange}
+                              className="w-full h-9 md:h-[44px] pl-9 md:pl-12 pr-9 md:pr-12 text-sm md:text-base text-gray-800 rounded-full border border-[#dfe1e5] focus:outline-none focus:shadow-md focus:border-transparent hover:shadow-md transition-shadow"
+                              style={{ fontFamily: 'Arial, sans-serif' }}
+                            />
+                            {isSearching && (
+                              <RefreshCw className="absolute right-3 md:right-4 w-4 h-4 md:w-5 md:h-5 text-gray-400 animate-spin" />
+                            )}
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+
+                    {/* Results Info */}
+                    {totalResults > 0 && (
+                      <div className="mb-3 text-xs md:text-sm text-[#5f6368]" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        About {totalResults.toLocaleString()} results ({searchTime.toFixed(2)} seconds)
+                      </div>
+                    )}
+
+                    {/* Error Message */}
+                    {searchError && (
+                      <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded text-red-800 text-sm" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        {searchError}
+                      </div>
+                    )}
+
+                    {/* Loading State */}
+                    {isSearching && searchResults.length === 0 && (
+                      <div className="flex items-center justify-center py-12">
+                        <div className="flex flex-col items-center gap-3">
+                          <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+                          <span className="text-sm text-gray-500" style={{ fontFamily: 'Arial, sans-serif' }}>Searching...</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Search Results */}
+                    {!isSearching && searchResults.length > 0 && (
+                      <div className="space-y-6 md:space-y-8">
+                        {searchResults.map((result, index) => {
+                          const thumbnail = result.pagemap?.cse_image?.[0]?.src;
+                          return (
+                            <div key={index} className="flex gap-3 md:gap-4">
+                              {thumbnail && (
+                                <div className="flex-shrink-0">
+                                  <img
+                                    src={thumbnail}
+                                    alt=""
+                                    className="w-16 h-16 md:w-20 md:h-20 object-cover rounded border border-gray-200"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display = 'none';
+                                    }}
+                                  />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <div className="mb-1">
+                                  <a
+                                    href={result.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-lg md:text-xl text-[#1a0dab] hover:underline cursor-pointer visited:text-[#681da8]"
+                                    style={{ fontFamily: 'Arial, sans-serif' }}
+                                  >
+                                    {result.title}
+                                  </a>
+                                </div>
+                                <div className="mb-1 text-xs md:text-sm text-[#006621]" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                  {result.displayLink}
+                                </div>
+                                <div className="text-sm text-[#4d5156] leading-relaxed" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                  {result.snippet}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* No Results */}
+                    {!isSearching && !searchError && searchResults.length === 0 && hasSearched && (
+                      <div className="text-center py-12">
+                        <div className="text-gray-500 text-base" style={{ fontFamily: 'Arial, sans-serif' }}>
+                          No results found for "{searchQuery}"
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Pagination */}
+                    {!isSearching && searchResults.length > 0 && (
+                      <div className="mt-8 md:mt-10 flex items-center justify-center gap-4">
+                        <button
+                          onClick={handlePrevPage}
+                          disabled={currentPage === 1}
+                          className="px-4 py-2 bg-[#f8f9fa] text-sm text-[#3c4043] rounded border border-[#dadce0] hover:border-gray-300 hover:shadow-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                          style={{ fontFamily: 'Arial, sans-serif' }}
+                        >
+                          Previous
+                        </button>
+                        <div className="text-sm text-[#5f6368]" style={{ fontFamily: 'Arial, sans-serif' }}>
+                          Page {currentPage}
+                        </div>
+                        <button
+                          onClick={handleNextPage}
+                          disabled={currentPage * 10 >= totalResults}
+                          className="px-4 py-2 bg-[#f8f9fa] text-sm text-[#3c4043] rounded border border-[#dadce0] hover:border-gray-300 hover:shadow-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                          style={{ fontFamily: 'Arial, sans-serif' }}
+                        >
+                          Next
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ) : (
               <div className="w-full h-full">
