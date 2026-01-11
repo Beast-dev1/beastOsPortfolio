@@ -17,6 +17,7 @@ import StartMenu from './StartMenu';
 import Terminal from './Terminal';
 import FileExplorer from './FileExplorer';
 import Chrome from './Chrome';
+import Music from './Music';
 
 export default function Taskbar() {
   const { windows, addWindow, restoreWindow, setWindowState, bringToFront } = useWindowContext();
@@ -91,6 +92,11 @@ export default function Taskbar() {
       
       if (appId === 'GoogleChrome') {
         addWindow(appId, <Chrome />, 1200, 800, appIcon);
+        return;
+      }
+      
+      if (appId === 'Music') {
+        addWindow(appId, <Music />, 900, 600, appIcon);
         return;
       }
       
@@ -199,7 +205,7 @@ export default function Taskbar() {
                   {/* Active indicator line */}
                   {isActive && (
                     <motion.div
-                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 h-0.5 bg-[#0078D4] rounded-full"
+                      className="absolute bottom-1 left-3 -translate-x-1/2 -translate-y-1/2 w-1/2 h-0.5 bg-[#0078D4] rounded-full"
                       layoutId="activeIndicator"
                       initial={false}
                     />

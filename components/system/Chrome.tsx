@@ -67,16 +67,20 @@ interface SearchResponse {
   };
 }
 
-export default function Chrome() {
+interface ChromeProps {
+  initialUrl?: string;
+}
+
+export default function Chrome({ initialUrl = undefined }: ChromeProps = {}) {
   const [tabs, setTabs] = useState<Tab[]>([
     {
       id: 'tab-1',
-      url: '',
-      title: 'New Tab',
-      history: [],
-      historyIndex: -1,
-      isLoading: false,
-      isNewTab: true,
+      url: initialUrl || '',
+      title: initialUrl ? 'Loading...' : 'New Tab',
+      history: initialUrl ? [initialUrl] : [],
+      historyIndex: initialUrl ? 0 : -1,
+      isLoading: !!initialUrl,
+      isNewTab: !initialUrl,
     },
   ]);
   const [activeTabId, setActiveTabId] = useState<string>('tab-1');
@@ -303,7 +307,13 @@ export default function Chrome() {
     (url: string, tabId?: string) => {
       const targetTabId = tabId || activeTabId;
       const sanitized = sanitizeUrl(url);
-      const normalized = validateAndNormalizeUrl(sanitized) || sanitized;
+      // Preserve local paths (starting with /) and file:// URLs
+      let normalized: string;
+      if (sanitized.startsWith('/') || sanitized.startsWith('file://')) {
+        normalized = sanitized;
+      } else {
+        normalized = validateAndNormalizeUrl(sanitized) || sanitized;
+      }
 
       setTabs((prev) =>
         prev.map((tab) => {
@@ -347,6 +357,12 @@ export default function Chrome() {
         if (activeTab.isNewTab) {
           setSearchQuery('');
         }
+        return;
+      }
+
+      // Check if it's a local path (starts with /)
+      if (inputValue.startsWith('/')) {
+        navigateToUrl(inputValue);
         return;
       }
 
@@ -786,16 +802,28 @@ export default function Chrome() {
               </div>
             ) : (
               <div className="w-full h-full">
-                <iframe
-                  ref={(el) => {
-                    if (el) iframeRefs.current.set(tab.id, el);
-                  }}
-                  src={tab.url}
-                  className="w-full h-full border-0"
-                  onLoad={() => handleIframeLoad(tab.id)}
-                  sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
-                  title={tab.title}
-                />
+                {tab.url.toLowerCase().endsWith('.pdf') ? (
+                  <iframe
+                    ref={(el) => {
+                      if (el) iframeRefs.current.set(tab.id, el);
+                    }}
+                    src={tab.url}
+                    className="w-full h-full border-0"
+                    onLoad={() => handleIframeLoad(tab.id)}
+                    title={tab.title}
+                  />
+                ) : (
+                  <iframe
+                    ref={(el) => {
+                      if (el) iframeRefs.current.set(tab.id, el);
+                    }}
+                    src={tab.url}
+                    className="w-full h-full border-0"
+                    onLoad={() => handleIframeLoad(tab.id)}
+                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                    title={tab.title}
+                  />
+                )}
                 {tab.isLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
                     <div className="flex flex-col items-center gap-2">

@@ -22,7 +22,6 @@ import {
   List,
   Filter,
   MoreHorizontal,
-  Pin,
   HardDrive,
   Network,
   Clock,
@@ -43,10 +42,14 @@ import { useWindowContext } from '@/Context/windowContext';
 import { fileExplorerConfig } from '@/config/fileExplorerConfig';
 import { appConfig } from '@/config/apps';
 import Terminal from './Terminal';
+import Chrome from './Chrome';
+import Photos from './Photos';
+import MusicPlayer from './Music';
+import VideoPlayer from './Video';
 
 type ViewMode = 'grid' | 'list' | 'details';
 type TabType = 'recent' | 'favorites' | 'shared';
-type CurrentView = 'home' | 'folder' | 'thispc' | 'drive';
+type CurrentView = 'home' | 'folder' | 'thispc' | 'drive' | 'desktop' | 'documents' | 'pictures' | 'music' | 'videos';
 
 interface NavigationHistory {
   path: string | null;
@@ -145,6 +148,36 @@ export default function FileExplorer() {
     return folders;
   };
 
+  // Get desktop applications
+  const getDesktopApplications = (): DriveItem[] => {
+    // Filter out File Explorer from applications
+    const apps: DriveItem[] = appConfig.taskbarApps
+      .filter((app) => app.id !== 'FileExplorer')
+      .map((app) => ({
+        name: app.name,
+        dateModified: '01/11/2026 5:19 PM',
+        type: 'Application',
+        size: '-',
+        icon: app.icon,
+        id: app.id,
+      }));
+    return apps;
+  };
+
+  // Get Documents folder contents (resume.pdf)
+  const getDocumentsContents = (): DriveItem[] => {
+    return [
+      {
+        name: 'my resume',
+        dateModified: '12/31/2025 4:29 PM',
+        type: 'PDF File',
+        size: '248 KB',
+        icon: undefined, // Will use FileText icon as fallback
+        id: 'resume-pdf',
+      },
+    ];
+  };
+
   // Initialize navigation history
   useEffect(() => {
     if (currentView === 'home') {
@@ -158,7 +191,7 @@ export default function FileExplorer() {
     if (currentView === 'thispc') {
       setExpandedSections(new Set(['thispc', 'devices']));
     }
-    if (currentView === 'drive') {
+    if (currentView === 'drive' || currentView === 'desktop' || currentView === 'documents' || currentView === 'pictures' || currentView === 'music' || currentView === 'videos') {
       setViewMode('details');
     }
   }, [currentView]);
@@ -200,6 +233,16 @@ export default function FileExplorer() {
         setCurrentView('home');
       } else if (historyItem.path === 'This PC') {
         setCurrentView('thispc');
+      } else if (historyItem.path === 'Desktop') {
+        setCurrentView('desktop');
+      } else if (historyItem.path === 'Documents') {
+        setCurrentView('documents');
+      } else if (historyItem.path === 'Pictures') {
+        setCurrentView('pictures');
+      } else if (historyItem.path === 'Music') {
+        setCurrentView('music');
+      } else if (historyItem.path === 'Videos') {
+        setCurrentView('videos');
       } else if (historyItem.directoryId?.startsWith('drive-')) {
         setCurrentView('drive');
       } else {
@@ -219,6 +262,16 @@ export default function FileExplorer() {
         setCurrentView('home');
       } else if (historyItem.path === 'This PC') {
         setCurrentView('thispc');
+      } else if (historyItem.path === 'Desktop') {
+        setCurrentView('desktop');
+      } else if (historyItem.path === 'Documents') {
+        setCurrentView('documents');
+      } else if (historyItem.path === 'Pictures') {
+        setCurrentView('pictures');
+      } else if (historyItem.path === 'Music') {
+        setCurrentView('music');
+      } else if (historyItem.path === 'Videos') {
+        setCurrentView('videos');
       } else if (historyItem.directoryId?.startsWith('drive-')) {
         setCurrentView('drive');
       } else {
@@ -281,6 +334,76 @@ export default function FileExplorer() {
           );
         }
       }
+    } else if (item.id === 'desktop') {
+      // Navigate to desktop view
+      setCurrentView('desktop');
+      setCurrentPath('Desktop');
+      setCurrentDirectory(null);
+      // Add to history
+      const newHistory = navigationHistory.slice(0, historyIndex + 1);
+      newHistory.push({ path: 'Desktop', directoryId: null });
+      setNavigationHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+    } else if (item.id === 'downloads') {
+      // Navigate to Downloads folder (always empty)
+      const folder = files.find((f) => f.name === 'Downloads' && f.type === 'folder');
+      if (folder) {
+        navigateTo(folder.id, 'Downloads');
+      } else {
+        // Create Downloads folder if it doesn't exist
+        addFile({
+          name: 'Downloads',
+          type: 'folder',
+          parentId: null,
+        });
+        // Navigate after creation
+        setTimeout(() => {
+          const newFolder = files.find((f) => f.name === 'Downloads' && f.type === 'folder');
+          if (newFolder) {
+            navigateTo(newFolder.id, 'Downloads');
+          }
+        }, 100);
+      }
+    } else if (item.id === 'documents') {
+      // Navigate to Documents view
+      setCurrentView('documents');
+      setCurrentPath('Documents');
+      setCurrentDirectory(null);
+      // Add to history
+      const newHistory = navigationHistory.slice(0, historyIndex + 1);
+      newHistory.push({ path: 'Documents', directoryId: null });
+      setNavigationHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+    } else if (item.id === 'pictures') {
+      // Navigate to Pictures view
+      setCurrentView('pictures');
+      setCurrentPath('Pictures');
+      setCurrentDirectory(null);
+      // Add to history
+      const newHistory = navigationHistory.slice(0, historyIndex + 1);
+      newHistory.push({ path: 'Pictures', directoryId: null });
+      setNavigationHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+    } else if (item.id === 'music') {
+      // Navigate to Music view
+      setCurrentView('music');
+      setCurrentPath('Music');
+      setCurrentDirectory(null);
+      // Add to history
+      const newHistory = navigationHistory.slice(0, historyIndex + 1);
+      newHistory.push({ path: 'Music', directoryId: null });
+      setNavigationHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+    } else if (item.id === 'videos') {
+      // Navigate to Videos view
+      setCurrentView('videos');
+      setCurrentPath('Videos');
+      setCurrentDirectory(null);
+      // Add to history
+      const newHistory = navigationHistory.slice(0, historyIndex + 1);
+      newHistory.push({ path: 'Videos', directoryId: null });
+      setNavigationHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
     } else if (item.type === 'folder' || item.type === 'drive') {
       // Navigate to folder
       const folder = files.find((f) => f.name === item.path?.split('\\').pop() && f.type === 'folder');
@@ -375,7 +498,7 @@ export default function FileExplorer() {
     setIsCutting(false);
   };
 
-  const currentFiles = currentView === 'home' || currentView === 'drive' || currentView === 'thispc' ? [] : getChildren(currentDirectory);
+  const currentFiles = currentView === 'home' || currentView === 'drive' || currentView === 'thispc' || currentView === 'desktop' || currentView === 'documents' || currentView === 'pictures' || currentView === 'music' || currentView === 'videos' ? [] : getChildren(currentDirectory);
   const filteredFiles = currentFiles.filter((file) =>
     file.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -623,16 +746,91 @@ export default function FileExplorer() {
                 <button
                   key={item.id}
                   onClick={() => {
-                    if (item.type === 'folder' || item.type === 'drive') {
+                    if (item.id === 'desktop') {
+                      // Navigate to desktop view
+                      setCurrentView('desktop');
+                      setCurrentPath('Desktop');
+                      setCurrentDirectory(null);
+                      // Add to history
+                      const newHistory = navigationHistory.slice(0, historyIndex + 1);
+                      newHistory.push({ path: 'Desktop', directoryId: null });
+                      setNavigationHistory(newHistory);
+                      setHistoryIndex(newHistory.length - 1);
+                    } else if (item.id === 'downloads') {
+                      // Navigate to Downloads folder (always empty)
+                      const folder = files.find((f) => f.name === 'Downloads' && f.type === 'folder');
+                      if (folder) {
+                        navigateTo(folder.id, 'Downloads');
+                      } else {
+                        // Create Downloads folder if it doesn't exist
+                        addFile({
+                          name: 'Downloads',
+                          type: 'folder',
+                          parentId: null,
+                        });
+                        // Navigate after creation
+                        setTimeout(() => {
+                          const newFolder = files.find((f) => f.name === 'Downloads' && f.type === 'folder');
+                          if (newFolder) {
+                            navigateTo(newFolder.id, 'Downloads');
+                          }
+                        }, 100);
+                      }
+                    } else if (item.id === 'documents') {
+                      // Navigate to Documents view
+                      setCurrentView('documents');
+                      setCurrentPath('Documents');
+                      setCurrentDirectory(null);
+                      // Add to history
+                      const newHistory = navigationHistory.slice(0, historyIndex + 1);
+                      newHistory.push({ path: 'Documents', directoryId: null });
+                      setNavigationHistory(newHistory);
+                      setHistoryIndex(newHistory.length - 1);
+                    } else if (item.id === 'pictures') {
+                      // Navigate to Pictures view
+                      setCurrentView('pictures');
+                      setCurrentPath('Pictures');
+                      setCurrentDirectory(null);
+                      // Add to history
+                      const newHistory = navigationHistory.slice(0, historyIndex + 1);
+                      newHistory.push({ path: 'Pictures', directoryId: null });
+                      setNavigationHistory(newHistory);
+                      setHistoryIndex(newHistory.length - 1);
+                    } else if (item.id === 'music') {
+                      // Navigate to Music view
+                      setCurrentView('music');
+                      setCurrentPath('Music');
+                      setCurrentDirectory(null);
+                      // Add to history
+                      const newHistory = navigationHistory.slice(0, historyIndex + 1);
+                      newHistory.push({ path: 'Music', directoryId: null });
+                      setNavigationHistory(newHistory);
+                      setHistoryIndex(newHistory.length - 1);
+                    } else if (item.id === 'videos') {
+                      // Navigate to Videos view
+                      setCurrentView('videos');
+                      setCurrentPath('Videos');
+                      setCurrentDirectory(null);
+                      // Add to history
+                      const newHistory = navigationHistory.slice(0, historyIndex + 1);
+                      newHistory.push({ path: 'Videos', directoryId: null });
+                      setNavigationHistory(newHistory);
+                      setHistoryIndex(newHistory.length - 1);
+                    } else if (item.type === 'folder' || item.type === 'drive') {
                       const folder = files.find((f) => f.name === item.name && f.type === 'folder');
                       if (folder) {
                         navigateTo(folder.id, item.name);
                       }
                     }
                   }}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors group"
+                  className={`w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors group ${
+                    (currentView === 'desktop' && item.id === 'desktop') || 
+                    (currentView === 'documents' && item.id === 'documents') ||
+                    (currentView === 'pictures' && item.id === 'pictures') ||
+                    (currentView === 'music' && item.id === 'music') ||
+                    (currentView === 'videos' && item.id === 'videos') ? 'bg-[rgba(0,120,212,0.2)]' : ''
+                  }`}
                 >
-                  {item.pinned && <Pin className="w-3 h-3 text-gray-400 flex-shrink-0" />}
                   {item.type === 'drive' ? (
                     <Image
                       src="/icons/drives/c.png"
@@ -755,6 +953,16 @@ export default function FileExplorer() {
                 ? drives.length
                 : currentView === 'drive'
                 ? getDriveContents(currentDirectory?.replace('drive-', '') || 'c').length
+                : currentView === 'desktop'
+                ? getDesktopApplications().length
+                : currentView === 'documents'
+                ? getDocumentsContents().length
+                : currentView === 'pictures'
+                ? 0 // Pictures shows Photos component, no file count
+                : currentView === 'music'
+                ? 0 // Music shows Music component, no file count
+                : currentView === 'videos'
+                ? 0 // Videos shows Video component, no file count
                 : filteredFiles.length}{' '}
               items
             </span>
@@ -939,6 +1147,163 @@ export default function FileExplorer() {
                 </table>
               </div>
             </div>
+          ) : currentView === 'desktop' ? (
+            <div className="p-2 md:p-4">
+              {/* Desktop applications in details view */}
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-[#3a3a3a]">
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        <div className="flex items-center gap-1">
+                          Name
+                          <ChevronUp className="w-3 h-3" />
+                        </div>
+                      </th>
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        Date modified
+                      </th>
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        Type
+                      </th>
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        Size
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getDesktopApplications().map((item, index) => (
+                      <tr
+                        key={index}
+                        className="hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
+                        onClick={() => {
+                          if (item.type === 'Application' && item.id) {
+                            // Launch application
+                            const app = appConfig.taskbarApps.find((a) => a.id === item.id);
+                            if (app) {
+                              if (item.id === 'Terminal') {
+                                addWindow('Terminal', <Terminal />, 800, 500, app.icon);
+                              } else {
+                                addWindow(
+                                  item.id,
+                                  <div className="p-4 flex items-center justify-center h-full">
+                                    <div className="text-center">
+                                      <h2 className="text-xl font-semibold mb-2">{app.name}</h2>
+                                      <p className="text-sm text-gray-500">App component coming soon</p>
+                                    </div>
+                                  </div>,
+                                  800,
+                                  600,
+                                  app.icon
+                                );
+                              }
+                            }
+                          }
+                        }}
+                      >
+                        <td className="py-2 px-4 flex items-center gap-2">
+                          {item.type === 'Application' && item.icon ? (
+                            <Image
+                              src={item.icon}
+                              alt={item.name}
+                              width={16}
+                              height={16}
+                              className="w-4 h-4 object-contain flex-shrink-0"
+                              unoptimized
+                            />
+                          ) : (
+                            <FileText className="w-4 h-4 text-gray-400" />
+                          )}
+                          <span className="text-sm text-gray-300">{item.name}</span>
+                        </td>
+                        <td className="py-2 px-4 text-sm text-gray-400">{item.dateModified}</td>
+                        <td className="py-2 px-4 text-sm text-gray-400">{item.type}</td>
+                        <td className="py-2 px-4 text-sm text-gray-400">{item.size}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : currentView === 'documents' ? (
+            <div className="p-2 md:p-4">
+              {/* Documents folder contents in details view */}
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-[#3a3a3a]">
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        <div className="flex items-center gap-1">
+                          Name
+                          <ChevronUp className="w-3 h-3" />
+                        </div>
+                      </th>
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        Date modified
+                      </th>
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        Type
+                      </th>
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                        Size
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getDocumentsContents().map((item, index) => (
+                      <tr
+                        key={index}
+                        className="hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
+                        onClick={() => {
+                          // Open PDF in Chrome browser
+                          const chromeApp = appConfig.taskbarApps.find((app) => app.id === 'GoogleChrome');
+                          if (chromeApp) {
+                            addWindow(
+                              'GoogleChrome',
+                              <Chrome initialUrl="/resume/resume.pdf" />,
+                              1200,
+                              800,
+                              chromeApp.icon
+                            );
+                          }
+                        }}
+                      >
+                        <td className="py-2 px-4 flex items-center gap-2">
+                          {item.icon ? (
+                            <Image
+                              src={item.icon}
+                              alt={item.name}
+                              width={16}
+                              height={16}
+                              className="w-4 h-4 object-contain flex-shrink-0"
+                              unoptimized
+                            />
+                          ) : (
+                            <FileText className="w-4 h-4 text-gray-400" />
+                          )}
+                          <span className="text-sm text-gray-300">{item.name}</span>
+                        </td>
+                        <td className="py-2 px-4 text-sm text-gray-400">{item.dateModified}</td>
+                        <td className="py-2 px-4 text-sm text-gray-400">{item.type}</td>
+                        <td className="py-2 px-4 text-sm text-gray-400">{item.size}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : currentView === 'pictures' ? (
+            <div className="w-full h-full">
+              <Photos />
+            </div>
+          ) : currentView === 'music' ? (
+            <div className="w-full h-full">
+              <MusicPlayer />
+            </div>
+          ) : currentView === 'videos' ? (
+            <div className="w-full h-full">
+              <VideoPlayer />
+            </div>
           ) : currentView === 'home' ? (
             <div className="p-2 md:p-4">
               {/* Quick Access Section */}
@@ -987,9 +1352,6 @@ export default function FileExplorer() {
                         </div>
                         {item.location && (
                           <div className="text-[10px] text-gray-500 mt-0.5">{item.location}</div>
-                        )}
-                        {item.pinned && (
-                          <Pin className="w-3 h-3 text-gray-400 mx-auto mt-1" />
                         )}
                       </div>
                     </button>
@@ -1201,68 +1563,76 @@ export default function FileExplorer() {
               )}
 
               {viewMode === 'details' && (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-[#3a3a3a]">
-                        <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Name</th>
-                        <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Date modified</th>
-                        <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Type</th>
-                        <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Size</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredFiles.map((file) => (
-                        <tr
-                          key={file.id}
-                          onClick={(e) => {
-                            if (e.ctrlKey || e.metaKey) {
-                              const newSelected = new Set(selectedItems);
-                              if (newSelected.has(file.id)) {
-                                newSelected.delete(file.id);
-                              } else {
-                                newSelected.add(file.id);
-                              }
-                              setSelectedItems(newSelected);
-                            } else {
-                              setSelectedItems(new Set([file.id]));
-                              handleFileClick(file);
-                            }
-                          }}
-                          className={`border-b border-[#3a3a3a] hover:bg-[rgba(255,255,255,0.05)] cursor-pointer ${
-                            selectedItems.has(file.id) ? 'bg-[rgba(0,120,212,0.2)]' : ''
-                          }`}
-                        >
-                          <td className="py-2 px-4 flex items-center gap-2">
-                            {file.type === 'folder' ? (
-                              <Image
-                                src="/icons/folder/folder.png"
-                                alt={file.name}
-                                width={16}
-                                height={16}
-                                className="w-4 h-4 object-contain flex-shrink-0"
-                                unoptimized
-                              />
-                            ) : (
-                              <FileText className="w-4 h-4 text-gray-400" />
-                            )}
-                            <span className="text-sm text-gray-300">{file.name}</span>
-                          </td>
-                          <td className="py-2 px-4 text-sm text-gray-400">
-                            {new Date(file.lastAccessed).toLocaleString()}
-                          </td>
-                          <td className="py-2 px-4 text-sm text-gray-400">
-                            {file.type === 'folder' ? 'File folder' : 'File'}
-                          </td>
-                          <td className="py-2 px-4 text-sm text-gray-400">-</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <>
+                  {filteredFiles.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-[#3a3a3a]">
+                            <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Name</th>
+                            <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Date modified</th>
+                            <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Type</th>
+                            <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Size</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredFiles.map((file) => (
+                            <tr
+                              key={file.id}
+                              onClick={(e) => {
+                                if (e.ctrlKey || e.metaKey) {
+                                  const newSelected = new Set(selectedItems);
+                                  if (newSelected.has(file.id)) {
+                                    newSelected.delete(file.id);
+                                  } else {
+                                    newSelected.add(file.id);
+                                  }
+                                  setSelectedItems(newSelected);
+                                } else {
+                                  setSelectedItems(new Set([file.id]));
+                                  handleFileClick(file);
+                                }
+                              }}
+                              className={`border-b border-[#3a3a3a] hover:bg-[rgba(255,255,255,0.05)] cursor-pointer ${
+                                selectedItems.has(file.id) ? 'bg-[rgba(0,120,212,0.2)]' : ''
+                              }`}
+                            >
+                              <td className="py-2 px-4 flex items-center gap-2">
+                                {file.type === 'folder' ? (
+                                  <Image
+                                    src="/icons/folder/folder.png"
+                                    alt={file.name}
+                                    width={16}
+                                    height={16}
+                                    className="w-4 h-4 object-contain flex-shrink-0"
+                                    unoptimized
+                                  />
+                                ) : (
+                                  <FileText className="w-4 h-4 text-gray-400" />
+                                )}
+                                <span className="text-sm text-gray-300">{file.name}</span>
+                              </td>
+                              <td className="py-2 px-4 text-sm text-gray-400">
+                                {new Date(file.lastAccessed).toLocaleString()}
+                              </td>
+                              <td className="py-2 px-4 text-sm text-gray-400">
+                                {file.type === 'folder' ? 'File folder' : 'File'}
+                              </td>
+                              <td className="py-2 px-4 text-sm text-gray-400">-</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="py-16 text-center text-sm text-gray-400">
+                      {searchQuery ? 'No files match your search' : 'This folder is empty'}
+                    </div>
+                  )}
+                </>
               )}
 
-              {filteredFiles.length === 0 && (
+              {viewMode !== 'details' && filteredFiles.length === 0 && (
                 <div className="py-16 text-center text-sm text-gray-400">
                   {searchQuery ? 'No files match your search' : 'This folder is empty'}
                 </div>
