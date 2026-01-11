@@ -18,6 +18,7 @@ import Terminal from './Terminal';
 import FileExplorer from './FileExplorer';
 import Chrome from './Chrome';
 import Music from './Music';
+import AboutMe from './AboutMe';
 
 export default function Taskbar() {
   const { windows, addWindow, restoreWindow, setWindowState, bringToFront } = useWindowContext();
@@ -97,6 +98,11 @@ export default function Taskbar() {
       
       if (appId === 'Music') {
         addWindow(appId, <Music />, 900, 600, appIcon);
+        return;
+      }
+      
+      if (appId === 'aboutMe') {
+        addWindow(appId, <AboutMe />, 1000, 700, appIcon);
         return;
       }
       
