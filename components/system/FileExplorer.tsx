@@ -1341,12 +1341,12 @@ export default function FileExplorer() {
               {/* Quick Access Section */}
               <div className="mb-4">
                 <h2 className="text-xs md:text-sm font-semibold text-gray-300 mb-2 md:mb-3">Quick access</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1.5 md:gap-2">
                   {fileExplorerConfig.quickAccessItems.map((item) => (
                     <button
                       key={item.id}
                       onClick={() => handleQuickAccessClick(item)}
-                      className="flex flex-col items-center gap-2 p-3 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors group"
+                      className="flex flex-col items-center gap-1 p-2 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors group"
                     >
                       <div className="w-16 h-16 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center overflow-hidden border border-[rgba(255,255,255,0.1)]">
                         {item.type === 'app' ? (

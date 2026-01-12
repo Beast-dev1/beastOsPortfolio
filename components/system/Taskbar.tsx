@@ -21,6 +21,7 @@ import Chrome from './Chrome';
 import Music from './Music';
 import AboutMe from './AboutMe';
 import Mail from './Mail';
+import Photos from './Photos';
 
 interface WeatherData {
   temperature: number;
@@ -213,6 +214,11 @@ export default function Taskbar() {
       
       if (appId === 'Mail') {
         addWindow(appId, <Mail />, 1200, 800, appIcon);
+        return;
+      }
+      
+      if (appId === 'Photos') {
+        addWindow(appId, <Photos />, 1000, 700, appIcon);
         return;
       }
       
