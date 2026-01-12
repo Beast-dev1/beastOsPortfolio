@@ -28,7 +28,7 @@ interface WeatherData {
   icon: string;
 }
 
-const OPENWEATHER_API_KEY = 'beb58e7110af54e37403d574e6a3b901';
+const OPENWEATHER_API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || '';
 const DEFAULT_CITY = 'London'; // Fallback city if geolocation fails
 
 export default function Taskbar() {
@@ -304,13 +304,13 @@ export default function Taskbar() {
               alt="Windows Logo"
               width={28}
               height={28}
-              className="w-5 h-5 md:w-7 md:h-7 object-contain"
+              className="w-4 h-4 md:w-6 md:h-6 object-contain"
               unoptimized
             />
           </button>
 
           {/* Search Bar (Hidden on small mobile, visible on larger screens) */}
-          <div className="hidden sm:block relative flex items-center">
+          <div className="hidden sm:flex relative items-center">
             <Search className="w-4 h-4 text-white absolute left-2 md:left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
@@ -367,21 +367,21 @@ export default function Taskbar() {
         {/* Right Side - System Tray */}
         <div className="flex items-center h-full gap-0 pr-0 md:pr-0 flex-shrink-0">
           {/* System Icons (Hidden on mobile, visible on tablet+) */}
-          <div className="hidden md:flex items-center gap-0">
+          <div className="hidden md:flex items-center gap-0 -space-x-1">
             <button
-              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
+              className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
               aria-label="WiFi"
             >
               <Wifi className="w-4 h-5 text-white" />
             </button>
             <button
-              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
+              className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
               aria-label="Volume"
             >
               <Volume2 className="w-4 h-5 text-white" />
             </button>
             <button
-              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
+              className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
               aria-label="Battery"
             >
               <Icon icon="gg:battery" className="w-4 h-6 text-white" />

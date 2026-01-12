@@ -39,8 +39,8 @@ interface Tab {
   hasSearched?: boolean;
 }
 
-const GOOGLE_API_KEY = 'AIzaSyAw6utXcUhdzoqQQscBmW2ABe6feRmbplw';
-const GOOGLE_CX_ID = '27e69eaf2dd014810';
+const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || '';
+const GOOGLE_CX_ID = process.env.NEXT_PUBLIC_GOOGLE_CX_ID || '';
 
 interface SearchResult {
   title: string;
@@ -722,7 +722,7 @@ export default function Chrome({ initialUrl = undefined }: ChromeProps = {}) {
                   {!tab.isSearching && !tab.searchError && (!tab.searchResults || tab.searchResults.length === 0) && tab.hasSearched && (
                     <div className="text-center py-12">
                       <div className="text-gray-500 text-base" style={{ fontFamily: 'Arial, sans-serif' }}>
-                        No results found for "{tab.searchQuery}"
+                        No results found for &quot;{tab.searchQuery}&quot;
                       </div>
                     </div>
                   )}
@@ -795,7 +795,7 @@ export default function Chrome({ initialUrl = undefined }: ChromeProps = {}) {
                       Google Search
                     </button>
                     <button className="px-4 py-2 bg-[#f8f9fa] text-xs md:text-sm text-gray-700 rounded border border-transparent hover:border-gray-300 hover:shadow-sm transition-all" style={{ fontFamily: 'Arial, sans-serif' }}>
-                      I'm Feeling Lucky
+                      I&apos;m Feeling Lucky
                     </button>
                   </div>
                 </div>

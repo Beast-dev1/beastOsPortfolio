@@ -49,6 +49,100 @@ myPortfolio/
 └── styles/           # Global styles
 ```
 
+## Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```env
+NEXT_PUBLIC_OPENWEATHER_API_KEY=your_openweather_api_key_here
+NEXT_PUBLIC_GOOGLE_API_KEY=your_google_api_key_here
+NEXT_PUBLIC_GOOGLE_CX_ID=your_google_cx_id_here
+```
+
+- **OpenWeatherMap API Key**: Get your API key from [OpenWeatherMap](https://home.openweathermap.org/api_keys)
+- **Google Custom Search API**: Get your API key and CX ID from [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+
+You can use `.env.example` as a template.
+
+## Deployment
+
+### Deploying to Vercel
+
+This project is configured for easy deployment on [Vercel](https://vercel.com), the platform created by the Next.js team.
+
+#### Prerequisites
+- A GitHub, GitLab, or Bitbucket account
+- A Vercel account (sign up at [vercel.com](https://vercel.com))
+
+#### Steps
+
+1. **Push your code to GitHub**
+   ```bash
+   git add .
+   git commit -m "Ready for deployment"
+   git push origin main
+   ```
+
+2. **Import your project to Vercel**
+   - Go to [vercel.com/new](https://vercel.com/new)
+   - Click "Import Git Repository"
+   - Select your repository
+   - Vercel will auto-detect Next.js settings
+
+3. **Configure Environment Variables**
+   - In the Vercel project settings, go to "Environment Variables"
+   - Add the following variables:
+     - `NEXT_PUBLIC_OPENWEATHER_API_KEY`
+     - `NEXT_PUBLIC_GOOGLE_API_KEY`
+     - `NEXT_PUBLIC_GOOGLE_CX_ID`
+   - Set them for all environments (Production, Preview, Development)
+
+4. **Deploy**
+   - Click "Deploy"
+   - Vercel will automatically build and deploy your application
+   - Your app will be live at `your-project.vercel.app`
+
+#### Automatic Deployments
+
+Vercel automatically deploys:
+- **Production**: Every push to `main` or `master` branch
+- **Preview**: Every push to other branches and pull requests
+
+### Testing Production Build Locally
+
+Before deploying, test the production build:
+
+```bash
+npm run build
+npm start
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to verify everything works.
+
+## CI/CD
+
+This project includes GitHub Actions for continuous integration:
+
+- **Linting**: Runs ESLint on every push and pull request
+- **Build Check**: Verifies the application builds successfully
+- **Automated Testing**: Ensures code quality before deployment
+
+The CI workflow is located at `.github/workflows/ci.yml`.
+
+To use GitHub Actions secrets for environment variables in CI:
+1. Go to your GitHub repository
+2. Navigate to Settings → Secrets and variables → Actions
+3. Add the required secrets:
+   - `NEXT_PUBLIC_OPENWEATHER_API_KEY`
+   - `NEXT_PUBLIC_GOOGLE_API_KEY`
+   - `NEXT_PUBLIC_GOOGLE_CX_ID`
+
+## Learn More
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Vercel Documentation](https://vercel.com/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+
 
 
 
