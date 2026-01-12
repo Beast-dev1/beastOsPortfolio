@@ -8,7 +8,8 @@ import {
   Volume2, 
   ChevronUp,
   Search,
-  CloudSun
+  CloudSun,
+  Loader2
 } from 'lucide-react';
 import { Icon } from '@iconify/react';
 import { useWindowContext } from '@/Context/windowContext';
@@ -21,19 +22,122 @@ import Music from './Music';
 import AboutMe from './AboutMe';
 import Mail from './Mail';
 
+interface WeatherData {
+  temperature: number;
+  condition: string;
+  icon: string;
+}
+
+const OPENWEATHER_API_KEY = 'beb58e7110af54e37403d574e6a3b901';
+const DEFAULT_CITY = 'London'; // Fallback city if geolocation fails
+
 export default function Taskbar() {
   const { windows, addWindow, restoreWindow, setWindowState, bringToFront } = useWindowContext();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
   const [showSystemTray, setShowSystemTray] = useState(false);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(true);
+  const [weatherError, setWeatherError] = useState<string | null>(null);
 
-  // Update time every minute
+  // Update time every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
     return () => clearInterval(timer);
+  }, []);
+
+  // Fetch weather data
+  const fetchWeather = async (city: string) => {
+    try {
+      setWeatherLoading(true);
+      setWeatherError(null);
+      
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch weather data');
+      }
+
+      const data = await response.json();
+      
+      setWeather({
+        temperature: Math.round(data.main.temp),
+        condition: data.weather[0].main,
+        icon: data.weather[0].icon,
+      });
+    } catch (error) {
+      console.error('Error fetching weather:', error);
+      setWeatherError('Unable to load weather');
+      // Set fallback data
+      setWeather({
+        temperature: 20,
+        condition: 'Partly sunny',
+        icon: '02d',
+      });
+    } finally {
+      setWeatherLoading(false);
+    }
+  };
+
+  // Get user location and fetch weather
+  useEffect(() => {
+    const getWeatherData = async () => {
+      // Try to get user's location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            try {
+              setWeatherLoading(true);
+              setWeatherError(null);
+              
+              const response = await fetch(
+                `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${OPENWEATHER_API_KEY}&units=metric`
+              );
+
+              if (!response.ok) {
+                throw new Error('Failed to fetch weather data');
+              }
+
+              const data = await response.json();
+              
+              setWeather({
+                temperature: Math.round(data.main.temp),
+                condition: data.weather[0].main,
+                icon: data.weather[0].icon,
+              });
+            } catch (error) {
+              console.error('Error fetching weather:', error);
+              // Fallback to default city
+              await fetchWeather(DEFAULT_CITY);
+            } finally {
+              setWeatherLoading(false);
+            }
+          },
+          async () => {
+            // Geolocation failed, use default city
+            await fetchWeather(DEFAULT_CITY);
+          }
+        );
+      } else {
+        // Geolocation not supported, use default city
+        await fetchWeather(DEFAULT_CITY);
+      }
+    };
+
+    getWeatherData();
+
+    // Refresh weather every 10 minutes
+    const weatherInterval = setInterval(() => {
+      getWeatherData();
+    }, 10 * 60 * 1000);
+
+    return () => clearInterval(weatherInterval);
   }, []);
 
   // Close Start Menu when clicking outside
@@ -151,11 +255,39 @@ export default function Taskbar() {
       >
         {/* Left Side - Weather Widget (Hidden on mobile) */}
         <div className="hidden md:flex items-center gap-2 px-2 py-1.5 ml-1 rounded-md hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200 cursor-pointer">
-          <CloudSun className="w-5 h-5 text-white" />
-          <div className="flex flex-col">
-            <span className="text-xs font-medium text-white leading-tight">20°C</span>
-            <span className="text-[12px] text-gray-300 leading-tight">Partly sunny</span>
-          </div>
+          {weatherLoading ? (
+            <Loader2 className="w-5 h-5 text-white animate-spin" />
+          ) : weather ? (
+            <>
+              {weather.icon ? (
+                <img
+                  src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+                  alt={weather.condition}
+                  className="w-8 h-8"
+                />
+              ) : (
+                <CloudSun className="w-5 h-5 text-white" />
+              )}
+              <div className="flex flex-col">
+                <span className="text-xs font-medium text-white leading-tight">
+                  {weather.temperature}°C
+                </span>
+                <span className="text-[12px] text-gray-300 leading-tight capitalize">
+                  {weather.condition}
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <CloudSun className="w-5 h-5 text-white" />
+              <div className="flex flex-col">
+                <span className="text-xs font-medium text-white leading-tight">--°C</span>
+                <span className="text-[12px] text-gray-300 leading-tight">
+                  {weatherError || 'Loading...'}
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Center Section - Start Button, Search Bar, and App Icons */}

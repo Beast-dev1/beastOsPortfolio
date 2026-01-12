@@ -145,7 +145,7 @@ export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-16 left-1/2 -translate-x-1/2 z-[10000] w-[calc(100vw-2rem)] max-w-[1000px] h-[calc(100vh-8rem)] max-h-[600px] md:h-[600px] rounded-2xl overflow-hidden"
+            className="fixed bottom-16 left-60 -translate-x-1/2 z-[10000] w-[calc(100vw-2rem)] max-w-[1000px] h-[calc(100vh-8rem)] max-h-[600px] md:h-[600px] rounded-2xl overflow-hidden"
             style={{
               background: 'rgba(30, 30, 30, 0.95)',
               backdropFilter: 'blur(40px)',
