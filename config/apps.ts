@@ -2,7 +2,7 @@ export type AppConfig = typeof appConfig;
 
 export const appConfig = {
   taskbarApps: [
-    { name: 'File Explorer', icon: '/icons/explorer/explorer.png', id: 'FileExplorer' },
+    { name: 'This PC', icon: '/icons/this-pc/this-pc.png', id: 'FileExplorer' },
     { name: 'Mail', icon: '/cursor/mail-svgrepo-com.svg', id: 'Mail' },
     { name: 'Music', icon: '/cursor/music.svg', id: 'Music' },
     { name: 'Photos', icon: '/icons/pictures/pictures.png', id: 'Photos' },
@@ -17,7 +17,7 @@ export const appConfig = {
     { name: 'PowerPoint', icon: '/cursor/file-type-powerpoint2.svg', id: 'PowerPoint' },
     { name: 'Excel', icon: '/cursor/excel.svg', id: 'Excel' },
     { name: 'Microsoft Store', icon: '/cursor/store.svg', id: 'MicrosoftStore' },
-    { name: 'File Explorer', icon: '/icons/explorer/explorer.png', id: 'FileExplorer' },
+    { name: 'This PC', icon: '/icons/this-pc/this-pc.png', id: 'FileExplorer' },
     { name: 'Google Chrome', icon: '/cursor/chrome.svg', id: 'GoogleChrome' },
     { name: 'Google Play ', icon: '/cursor/googleplay.svg', id: 'GooglePlayBooks' },
     { name: 'WhatsApp', icon: '/cursor/whatsapp.svg', id: 'WhatsApp' },

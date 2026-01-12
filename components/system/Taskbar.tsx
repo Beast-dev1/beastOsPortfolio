@@ -192,7 +192,7 @@ export default function Taskbar() {
       }
       
       if (appId === 'FileExplorer') {
-        addWindow(appId, <FileExplorer />, 1000, 700, appIcon);
+        addWindow(appId, <FileExplorer />, 1000, 700, appIcon, 'This PC');
         return;
       }
       

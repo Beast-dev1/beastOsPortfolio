@@ -97,7 +97,7 @@ export default function DesktopIcons() {
         }
 
         if (appId === 'FileExplorer') {
-          addWindow(appId, <FileExplorer />, 1000, 700, appIcon);
+          addWindow(appId, <FileExplorer />, 1000, 700, appIcon, 'This PC');
           return;
         }
 
@@ -161,7 +161,7 @@ export default function DesktopIcons() {
       } else {
         // Open new File Explorer window at the folder
         const appIcon = '/icons/explorer/explorer.png';
-        addWindow('FileExplorer', <FileExplorer />, 1000, 700, appIcon);
+        addWindow('FileExplorer', <FileExplorer />, 1000, 700, appIcon, 'This PC');
         // Navigate to folder after a small delay to ensure FileExplorer is mounted
         setTimeout(() => {
           setCurrentDirectory(folderId);
@@ -186,8 +186,8 @@ export default function DesktopIcons() {
         bringToFront('FileExplorer');
         setCurrentDirectory(parentId);
       } else {
-        const appIcon = '/icons/explorer/explorer.png';
-        addWindow('FileExplorer', <FileExplorer />, 1000, 700, appIcon);
+        const appIcon = '/icons/window/window.png';
+        addWindow('FileExplorer', <FileExplorer />, 1000, 700, appIcon, 'This PC');
         setTimeout(() => {
           setCurrentDirectory(parentId);
         }, 100);

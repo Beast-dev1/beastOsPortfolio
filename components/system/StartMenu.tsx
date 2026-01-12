@@ -74,7 +74,7 @@ export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
       if (appId === 'Terminal') {
         addWindow(appId, <Terminal />, 800, 500, appIcon);
       } else if (appId === 'FileExplorer') {
-        addWindow(appId, <FileExplorer />, 1000, 700, appIcon);
+        addWindow(appId, <FileExplorer />, 1000, 700, appIcon, 'This PC');
       } else if (appId === 'GoogleChrome') {
         addWindow(appId, <Chrome />, 1200, 800, appIcon);
       } else if (appId === 'Photos') {

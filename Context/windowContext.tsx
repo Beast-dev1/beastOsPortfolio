@@ -26,7 +26,8 @@ interface WindowContextType {
     content: React.ReactNode,
     width?: number,
     height?: number,
-    icon?: string
+    icon?: string,
+    title?: string
   ) => void;
   removeWindow: (id: string) => void;
   bringToFront: (id: string) => void;
@@ -50,7 +51,8 @@ export const WindowProvider: React.FC<{ children: React.ReactNode }> = ({
       content: React.ReactNode,
       width: number = 100,
       height: number = 300,
-      icon: string = ''
+      icon: string = '',
+      title?: string
     ) => {
       setWindows((prev) => {
         const windowExists = prev.some((window) => window.id === id);
@@ -82,6 +84,7 @@ export const WindowProvider: React.FC<{ children: React.ReactNode }> = ({
           ...prev,
           {
             id,
+            title,
             isVisible: true,
             isMinimized: false,
             isMaximized: false,
