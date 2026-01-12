@@ -77,3 +77,4 @@ console.log('- https://htmlcsstoimage.com/');
 console.log('- Or add your own wallpaper images to public/wallpapers/');
 
 
+
