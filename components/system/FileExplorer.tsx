@@ -46,6 +46,8 @@ import Chrome from './Chrome';
 import Photos from './Photos';
 import MusicPlayer from './Music';
 import VideoPlayer from './Video';
+import Mail from './Mail';
+import AboutMe from './AboutMe';
 
 type ViewMode = 'grid' | 'list' | 'details';
 type TabType = 'recent' | 'favorites' | 'shared';
@@ -319,6 +321,16 @@ export default function FileExplorer() {
       if (app) {
         if (item.id === 'Terminal') {
           addWindow('Terminal', <Terminal />, 800, 500, app.icon);
+        } else if (item.id === 'Mail') {
+          addWindow('Mail', <Mail />, 1200, 800, app.icon);
+        } else if (item.id === 'Music') {
+          addWindow('Music', <MusicPlayer />, 900, 600, app.icon);
+        } else if (item.id === 'aboutMe') {
+          addWindow('aboutMe', <AboutMe />, 1000, 700, app.icon);
+        } else if (item.id === 'GoogleChrome') {
+          addWindow('GoogleChrome', <Chrome />, 1200, 800, app.icon);
+        } else if (item.id === 'Photos') {
+          addWindow('Photos', <Photos />, 1000, 700, app.icon);
         } else {
           addWindow(
             item.id,
@@ -1096,6 +1108,16 @@ export default function FileExplorer() {
                             if (app) {
                               if (item.id === 'Terminal') {
                                 addWindow('Terminal', <Terminal />, 800, 500, app.icon);
+                              } else if (item.id === 'Mail') {
+                                addWindow('Mail', <Mail />, 1200, 800, app.icon);
+                              } else if (item.id === 'Music') {
+                                addWindow('Music', <MusicPlayer />, 900, 600, app.icon);
+                              } else if (item.id === 'aboutMe') {
+                                addWindow('aboutMe', <AboutMe />, 1000, 700, app.icon);
+                              } else if (item.id === 'GoogleChrome') {
+                                addWindow('GoogleChrome', <Chrome />, 1200, 800, app.icon);
+                              } else if (item.id === 'Photos') {
+                                addWindow('Photos', <Photos />, 1000, 700, app.icon);
                               } else {
                                 addWindow(
                                   item.id,
@@ -1183,6 +1205,16 @@ export default function FileExplorer() {
                             if (app) {
                               if (item.id === 'Terminal') {
                                 addWindow('Terminal', <Terminal />, 800, 500, app.icon);
+                              } else if (item.id === 'Mail') {
+                                addWindow('Mail', <Mail />, 1200, 800, app.icon);
+                              } else if (item.id === 'Music') {
+                                addWindow('Music', <MusicPlayer />, 900, 600, app.icon);
+                              } else if (item.id === 'aboutMe') {
+                                addWindow('aboutMe', <AboutMe />, 1000, 700, app.icon);
+                              } else if (item.id === 'GoogleChrome') {
+                                addWindow('GoogleChrome', <Chrome />, 1200, 800, app.icon);
+                              } else if (item.id === 'Photos') {
+                                addWindow('Photos', <Photos />, 1000, 700, app.icon);
                               } else {
                                 addWindow(
                                   item.id,

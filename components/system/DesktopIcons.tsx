@@ -10,6 +10,9 @@ import Terminal from './Terminal';
 import FileExplorer from './FileExplorer';
 import Chrome from './Chrome';
 import Photos from './Photos';
+import Mail from './Mail';
+import Music from './Music';
+import AboutMe from './AboutMe';
 
 export default function DesktopIcons() {
   const { 
@@ -105,6 +108,21 @@ export default function DesktopIcons() {
 
         if (appId === 'Photos') {
           addWindow(appId, <Photos />, 1000, 700, appIcon);
+          return;
+        }
+
+        if (appId === 'Mail') {
+          addWindow(appId, <Mail />, 1200, 800, appIcon);
+          return;
+        }
+
+        if (appId === 'Music') {
+          addWindow(appId, <Music />, 900, 600, appIcon);
+          return;
+        }
+
+        if (appId === 'aboutMe') {
+          addWindow(appId, <AboutMe />, 1000, 700, appIcon);
           return;
         }
 
