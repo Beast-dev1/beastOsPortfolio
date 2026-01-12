@@ -42,6 +42,18 @@ interface Tab {
 const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || '';
 const GOOGLE_CX_ID = process.env.NEXT_PUBLIC_GOOGLE_CX_ID || '';
 
+// #region agent log
+console.log('[DEBUG] Environment variables check:', {
+  hasApiKey: !!GOOGLE_API_KEY,
+  hasCxId: !!GOOGLE_CX_ID,
+  apiKeyLength: GOOGLE_API_KEY.length,
+  cxIdLength: GOOGLE_CX_ID.length,
+  envApiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY || 'undefined',
+  envCxId: process.env.NEXT_PUBLIC_GOOGLE_CX_ID || 'undefined'
+});
+fetch('http://127.0.0.1:7242/ingest/b11bfc49-f099-4aa2-868f-847f2eef9ac0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Chrome.tsx:42-43',message:'Environment variables loaded',data:{hasApiKey:!!GOOGLE_API_KEY,hasCxId:!!GOOGLE_CX_ID,apiKeyLength:GOOGLE_API_KEY.length,cxIdLength:GOOGLE_CX_ID.length,envApiKey:process.env.NEXT_PUBLIC_GOOGLE_API_KEY||'undefined',envCxId:process.env.NEXT_PUBLIC_GOOGLE_CX_ID||'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+// #endregion
+
 interface SearchResult {
   title: string;
   link: string;
@@ -151,20 +163,75 @@ export default function Chrome({ initialUrl = undefined }: ChromeProps = {}) {
       );
     }
 
-    const startIndex = (page - 1) * 10 + 1;
+    // Call our server-side API route instead of Google directly
+    const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=${page}`;
+    
+    // #region agent log
+    console.log('[DEBUG] Before API request to server route:', {
+      query,
+      page,
+      apiUrl,
+    });
+    fetch('http://127.0.0.1:7242/ingest/b11bfc49-f099-4aa2-868f-847f2eef9ac0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Chrome.tsx:157',message:'Before API request',data:{query,page,apiUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
 
     try {
-      const response = await fetch(
-        `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_CX_ID}&q=${encodeURIComponent(query)}&start=${startIndex}`
-      );
+      const response = await fetch(apiUrl);
+
+      // #region agent log
+      console.log('[DEBUG] API response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+      });
+      fetch('http://127.0.0.1:7242/ingest/b11bfc49-f099-4aa2-868f-847f2eef9ac0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Chrome.tsx:161',message:'API response received',data:{status:response.status,statusText:response.statusText,ok:response.ok},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
 
       if (!response.ok) {
-        throw new Error(`Search failed: ${response.statusText}`);
+        // #region agent log
+        console.error('[DEBUG] Response not OK:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: apiUrl,
+        });
+        fetch('http://127.0.0.1:7242/ingest/b11bfc49-f099-4aa2-868f-847f2eef9ac0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Chrome.tsx:164',message:'Response not OK',data:{status:response.status,statusText:response.statusText,url:apiUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
+        
+        let errorData: any = {};
+        try {
+          const text = await response.text();
+          errorData = JSON.parse(text);
+        } catch {
+          errorData = { error: `HTTP ${response.status}: ${response.statusText}` };
+        }
+        
+        // Show detailed error message
+        const errorMessage = errorData.error || errorData.details || `Search failed: ${response.statusText} (Status: ${response.status})`;
+        console.error('[DEBUG] Error details:', errorData);
+        throw new Error(errorMessage);
       }
 
       const data: SearchResponse = await response.json();
 
+      // #region agent log
+      console.log('[DEBUG] Response data parsed:', {
+        hasError: !!data.error,
+        errorCode: data.error?.code,
+        errorMessage: data.error?.message,
+        hasItems: !!data.items,
+        itemsCount: data.items?.length || 0,
+      });
+      fetch('http://127.0.0.1:7242/ingest/b11bfc49-f099-4aa2-868f-847f2eef9ac0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Chrome.tsx:170',message:'Response data parsed',data:{hasError:!!data.error,errorCode:data.error?.code,errorMessage:data.error?.message,hasItems:!!data.items,itemsCount:data.items?.length||0},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+      // #endregion
+
       if (data.error) {
+        // #region agent log
+        console.error('[DEBUG] API error in response:', {
+          errorCode: data.error.code,
+          errorMessage: data.error.message,
+        });
+        fetch('http://127.0.0.1:7242/ingest/b11bfc49-f099-4aa2-868f-847f2eef9ac0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Chrome.tsx:175',message:'API error in response',data:{errorCode:data.error.code,errorMessage:data.error.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+        // #endregion
         throw new Error(data.error.message || 'Search API error');
       }
 
@@ -192,9 +259,23 @@ export default function Chrome({ initialUrl = undefined }: ChromeProps = {}) {
         )
       );
     } catch (error) {
-      console.error('Search error:', error);
-      const errorMessage =
-        error instanceof Error ? error.message : 'An error occurred while searching. Please try again.';
+      console.error('[DEBUG] Search error caught:', error);
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/b11bfc49-f099-4aa2-868f-847f2eef9ac0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Chrome.tsx:194',message:'Search error caught',data:{errorMessage:error instanceof Error ? error.message : String(error),errorType:error instanceof Error ? error.constructor.name : typeof error,stack:error instanceof Error ? error.stack : undefined},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+      // #endregion
+      
+      let errorMessage = 'An error occurred while searching. Please try again.';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        // Provide helpful guidance for common errors
+        if (errorMessage.includes('MISSING_CREDENTIALS') || errorMessage.includes('not configured')) {
+          errorMessage = 'Google Search API is not configured. Please set GOOGLE_API_KEY and GOOGLE_CX_ID environment variables in your deployment platform (e.g., Vercel) and redeploy.';
+        } else if (errorMessage.includes('403') || errorMessage.includes('PERMISSION_DENIED')) {
+          errorMessage = 'Google Search API authentication failed. Please verify your API key and CX ID are correct in your environment variables.';
+        } else if (errorMessage.includes('NetworkError') || errorMessage.includes('Failed to fetch')) {
+          errorMessage = 'Network error: Could not reach the search API. Please check your internet connection and try again.';
+        }
+      }
 
       // Update tab with error
       setTabs((prev) =>
@@ -205,6 +286,7 @@ export default function Chrome({ initialUrl = undefined }: ChromeProps = {}) {
                 isSearching: false,
                 searchError: errorMessage,
                 searchResults: [],
+                hasSearched: true,
               }
             : tab
         )

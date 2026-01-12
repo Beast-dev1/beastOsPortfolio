@@ -55,12 +55,14 @@ Create a `.env.local` file in the root directory with the following variables:
 
 ```env
 NEXT_PUBLIC_OPENWEATHER_API_KEY=your_openweather_api_key_here
-NEXT_PUBLIC_GOOGLE_API_KEY=your_google_api_key_here
-NEXT_PUBLIC_GOOGLE_CX_ID=your_google_cx_id_here
+GOOGLE_API_KEY=your_google_api_key_here
+GOOGLE_CX_ID=your_google_cx_id_here
 ```
 
 - **OpenWeatherMap API Key**: Get your API key from [OpenWeatherMap](https://home.openweathermap.org/api_keys)
 - **Google Custom Search API**: Get your API key and CX ID from [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+  
+**Note**: Google Search API keys are now stored server-side (without `NEXT_PUBLIC_` prefix) for better security. The API route will also accept `NEXT_PUBLIC_GOOGLE_API_KEY` and `NEXT_PUBLIC_GOOGLE_CX_ID` as fallback for backward compatibility.
 
 You can use `.env.example` as a template.
 
@@ -93,8 +95,9 @@ This project is configured for easy deployment on [Vercel](https://vercel.com), 
    - In the Vercel project settings, go to "Environment Variables"
    - Add the following variables:
      - `NEXT_PUBLIC_OPENWEATHER_API_KEY`
-     - `NEXT_PUBLIC_GOOGLE_API_KEY`
-     - `NEXT_PUBLIC_GOOGLE_CX_ID`
+     - `GOOGLE_API_KEY` (server-side, more secure - recommended)
+     - `GOOGLE_CX_ID` (server-side, more secure - recommended)
+     - Or use `NEXT_PUBLIC_GOOGLE_API_KEY` and `NEXT_PUBLIC_GOOGLE_CX_ID` for backward compatibility
    - Set them for all environments (Production, Preview, Development)
 
 4. **Deploy**
@@ -134,8 +137,9 @@ To use GitHub Actions secrets for environment variables in CI:
 2. Navigate to Settings → Secrets and variables → Actions
 3. Add the required secrets:
    - `NEXT_PUBLIC_OPENWEATHER_API_KEY`
-   - `NEXT_PUBLIC_GOOGLE_API_KEY`
-   - `NEXT_PUBLIC_GOOGLE_CX_ID`
+   - `GOOGLE_API_KEY` (server-side, recommended)
+   - `GOOGLE_CX_ID` (server-side, recommended)
+   - Or use `NEXT_PUBLIC_GOOGLE_API_KEY` and `NEXT_PUBLIC_GOOGLE_CX_ID` for backward compatibility
 
 ## Learn More
 
