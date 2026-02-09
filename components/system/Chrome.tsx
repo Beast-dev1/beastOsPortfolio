@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import {
   ArrowLeft,
   ArrowRight,
@@ -617,9 +618,12 @@ export default function Chrome({ initialUrl = undefined }: ChromeProps = {}) {
               onClick={() => setActiveTabId(tab.id)}
             >
               {tab.favicon && !tab.isNewTab ? (
-                <img
+                <Image
                   src={tab.favicon}
                   alt=""
+                  width={12}
+                  height={12}
+                  unoptimized
                   className="w-3 h-3 flex-shrink-0"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
@@ -766,9 +770,12 @@ export default function Chrome({ initialUrl = undefined }: ChromeProps = {}) {
                           <div key={index} className="flex gap-3 md:gap-4">
                             {thumbnail && (
                               <div className="flex-shrink-0">
-                                <img
+                                <Image
                                   src={thumbnail}
                                   alt=""
+                                  width={80}
+                                  height={80}
+                                  unoptimized
                                   className="w-16 h-16 md:w-20 md:h-20 object-cover rounded border border-gray-200"
                                   onError={(e) => {
                                     (e.target as HTMLImageElement).style.display = 'none';

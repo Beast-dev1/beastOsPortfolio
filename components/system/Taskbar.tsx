@@ -268,9 +268,11 @@ export default function Taskbar() {
           ) : weather ? (
             <>
               {weather.icon ? (
-                <img
+                <Image
                   src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
                   alt={weather.condition}
+                  width={64}
+                  height={64}
                   className="w-8 h-8"
                 />
               ) : (

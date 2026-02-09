@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { ArrowBack, Delete } from '@mui/icons-material';
 import { Email } from '@/types/mail';
 
@@ -28,9 +29,11 @@ const ViewEmail = ({ email, openDrawer, onBack }: ViewEmailProps) => {
           </span>
         </div>
         <div className="flex mt-4">
-          <img
+          <Image
             src={emptyProfilePic}
             alt="profile"
+            width={40}
+            height={40}
             className="rounded-full w-10 h-10 my-1 mx-2.5 bg-[#cccccc]"
           />
           <div className="ml-4 w-full">

@@ -186,7 +186,7 @@ export default function FileExplorer() {
       setNavigationHistory([{ path: 'Home', directoryId: null }]);
       setHistoryIndex(0);
     }
-  }, []);
+  }, [currentView]);
 
   // Initialize expanded sections
   useEffect(() => {

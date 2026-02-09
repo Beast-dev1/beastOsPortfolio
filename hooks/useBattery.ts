@@ -1,5 +1,16 @@
 import { useState, useEffect } from 'react';
 
+// Battery Status API - not in standard Navigator types
+interface BatteryManager {
+  level: number;
+  charging: boolean;
+  addEventListener(type: string, listener: EventListener): void;
+}
+
+interface NavigatorWithBattery extends Navigator {
+  getBattery?: () => Promise<BatteryManager>;
+}
+
 export interface UseBatteryReturn {
   level: number | null;
   charging: boolean | null;
@@ -21,7 +32,7 @@ export function useBattery(): UseBatteryReturn {
 
     const initBattery = async () => {
       try {
-        const battery = await navigator.getBattery();
+        const battery = await (navigator as NavigatorWithBattery).getBattery!();
 
         setLevel(Math.round(battery.level * 100));
         setCharging(battery.charging);

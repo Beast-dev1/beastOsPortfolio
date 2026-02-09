@@ -112,7 +112,7 @@ export default React.memo(function DesktopIconItem({
         shouldPreventClickRef.current = false;
       }, 150);
     },
-    [icon.id, onPositionChange]
+    [icon.id, onPositionChange, x, y]
   );
 
   const handleClick = useCallback(

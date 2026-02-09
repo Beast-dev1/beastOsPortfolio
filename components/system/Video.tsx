@@ -79,7 +79,7 @@ export default function Video() {
         });
       }
     }
-  }, [currentVideo]);
+  }, [currentVideo, isPlaying]);
 
   // Handle play/pause state
   useEffect(() => {

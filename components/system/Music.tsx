@@ -78,7 +78,7 @@ export default function Music() {
         });
       }
     }
-  }, [currentSong]);
+  }, [currentSong, isPlaying]);
 
   // Handle play/pause state
   useEffect(() => {
