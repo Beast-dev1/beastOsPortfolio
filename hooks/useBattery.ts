@@ -30,25 +30,37 @@ export function useBattery(): UseBatteryReturn {
       return;
     }
 
+    let cancelled = false;
+    let refreshId: ReturnType<typeof setInterval> | null = null;
+
     const initBattery = async () => {
       try {
         const battery = await (navigator as NavigatorWithBattery).getBattery!();
+        if (cancelled) return;
 
-        setLevel(Math.round(battery.level * 100));
-        setCharging(battery.charging);
-
-        battery.addEventListener('levelchange', () => {
+        const updateBattery = () => {
           setLevel(Math.round(battery.level * 100));
-        });
-        battery.addEventListener('chargingchange', () => {
           setCharging(battery.charging);
-        });
+        };
+
+        updateBattery();
+
+        battery.addEventListener('levelchange', updateBattery);
+        battery.addEventListener('chargingchange', updateBattery);
+
+        // Periodic refresh: events may not fire reliably on some devices
+        refreshId = setInterval(updateBattery, 10000);
       } catch {
         // API error - leave state as null
       }
     };
 
     initBattery();
+
+    return () => {
+      cancelled = true;
+      if (refreshId) clearInterval(refreshId);
+    };
   }, []);
 
   return {

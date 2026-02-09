@@ -375,32 +375,32 @@ export default function Taskbar() {
         </div>
 
         {/* Right Side - System Tray */}
-        <div className="flex items-center h-full gap-0 pr-0 md:pr-0 flex-shrink-0">
+        <div className="flex items-center h-full gap-2 pr-2 md:pr-2 flex-shrink-0">
           {/* System Icons (Hidden on mobile, visible on tablet+) */}
-          <div className="hidden md:flex items-center gap-0 -space-x-1">
+          <div className="hidden md:flex items-center gap-1">
             <button
-              className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
               aria-label="WiFi"
             >
               <Wifi className="w-4 h-5 text-white" />
             </button>
             <button
-              className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
               aria-label="Volume"
             >
               <Volume2 className="w-4 h-5 text-white" />
             </button>
             <button
-              className="w-7 h-7 flex items-center justify-center gap-0.5 rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
-              aria-label={batterySupported && batteryLevel != null ? `Battery ${batteryLevel}%${batteryCharging ? ' (Charging)' : ''}` : 'Battery'}
-              title={batterySupported && batteryLevel != null ? `${batteryLevel}%${batteryCharging ? ' (Charging)' : ''}` : 'Battery'}
+              className="min-w-[4rem] h-8 px-2 flex items-center justify-center gap-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
+              aria-label={batterySupported && batteryLevel != null ? `Battery ${batteryLevel}%${batteryCharging && batteryLevel < 100 ? ' (Charging)' : ''}` : 'Battery'}
+              title={batterySupported && batteryLevel != null ? `${batteryLevel}%${batteryCharging && batteryLevel < 100 ? ' (Charging)' : ''}` : 'Battery'}
             >
               <Icon
-                icon={batteryCharging ? 'mdi:battery-charging' : 'gg:battery'}
+                icon={batteryCharging && batteryLevel != null && batteryLevel < 100 ? 'mdi:battery-charging' : 'gg:battery'}
                 className="w-4 h-6 text-white flex-shrink-0"
               />
               {batterySupported && batteryLevel != null && (
-                <span className="text-[10px] text-white font-medium">{batteryLevel}%</span>
+                <span className="text-[10px] text-white font-medium tabular-nums">{batteryLevel}%</span>
               )}
             </button>
           </div>
