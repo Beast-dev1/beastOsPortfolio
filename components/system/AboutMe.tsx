@@ -93,21 +93,21 @@ export default function AboutMe() {
 
   const personalInfo: PersonalInfo = {
     name: 'Prakash Rai',
-    role: 'Frontend Developer',
+    role: 'Full Stack Developer',
     location: 'Bagemati Zone, Nepal',
     email: 'prakashrai199@gmail.com',
     phone: '9810346419',
     linkedin: 'https://www.linkedin.com/in/prakashraii',
     github: '', // Not in resume
     summary:
-      "Creative and detail-oriented Frontend Developer with 1.5+ years of hands-on experience in building dynamic, scalable, and responsive web applications. Proficient in modern frontend technologies including React.js, Next.js, JavaScript (ES6+), HTML5, and CSS3, with a strong understanding of component-based architecture and state management. Skilled in translating UI/UX designs into high-quality code, integrating RESTful APIs, and optimizing performance for speed and usability. A collaborative team player with a passion for clean code, accessibility, and delivering seamless user experiences across all devices and platforms.",
+      "Full stack developer with 1.5+ years of experience building end-to-end web applications. Proficient in the MERN stack (MongoDB, Express, React, Node.js) and PostgreSQL, with Prisma ORM, Docker, and CI/CD workflows. Skilled in responsive frontends (React, Next.js), RESTful APIs, and clean, maintainable code. Passionate about delivering scalable solutions from database to UI.",
     yearsOfExperience: '1.5+',
-    projectsCompleted: '3+',
+    projectsCompleted: '7+',
   };
 
   const experience: Experience[] = [
     {
-      position: 'Frontend Developer',
+      position: 'Full Stack Developer',
       company: 'Web Studio Nepal',
       period: 'May 2024 – August 2025',
       location: 'Gyaneshowor',
@@ -115,6 +115,7 @@ export default function AboutMe() {
         'Developed responsive and interactive user interfaces using React.js, Next.js, HTML5, CSS3, and JavaScript (ES6+).',
         'Translated UI/UX designs from Figma or Adobe XD into high-quality code with pixel-perfect accuracy.',
         'Integrated RESTful APIs and managed dynamic data using Axios, Fetch API, and React Hooks.',
+        'Worked across the stack: API integration, data modeling, and frontend–backend coordination for full-featured applications.',
         'Implemented responsive design principles to ensure cross-browser and cross-device compatibility (mobile-first approach).',
         'Optimized performance through lazy loading, code splitting, and asset optimization, improving page load speed by 30%.',
         'Maintained state management using Redux, Context API, or local state.',
@@ -130,7 +131,7 @@ export default function AboutMe() {
       period: 'June 2025 – August 2025',
       url: 'https://shreeriddhisiddhijewellers.com/',
       description:
-        'Developed a fast, SEO-optimized, and responsive e-commerce website for Shree Riddhi Siddhi Jewellers using Next.js, featuring product catalogs, collections, custom jewelry services, and brand storytelling with high-quality imagery. Implemented static site generation (SSG) for product pages and server-side rendering (SSR) for dynamic sections like promotions, ensuring lightning-fast load times and excellent search engine visibility. Built a secure, role-based admin dashboard to manage extensive jewelry inventory, customer orders, customization requests, pricing updates, and sales analytics with real-time dashboards. Leveraged TanStack Query for optimized API handling: infinite queries for paginated product lists, optimistic mutations for quick order updates, caching for repeated views, and auto-refetching on focus or intervals.',
+        'Full stack e-commerce and role-based admin dashboard. Next.js with SSG/SSR, TanStack Query, and REST API for product catalogs, orders, and analytics.',
       technologies: ['Next.js', 'React', 'TanStack Query', 'Axios', 'SSG', 'SSR', 'REST API'],
     },
     {
@@ -139,7 +140,7 @@ export default function AboutMe() {
       period: 'May 2025 – July 2025',
       url: 'https://chinoorganica.com.np/',
       description:
-        'Developed a scalable Next.js web application that showcases organic products and company information with a fast, responsive UI and accessible navigation. Implemented server-rendered pages for performance and SEO, with client-side interactivity for a smooth user experience. Integrated a modular component library and clean page layouts to ensure consistency across sections (home, about, product catalogs, articles).',
+        'Next.js organic products site with SSR, responsive UI, and consistent layouts for home, about, product catalogs, and articles.',
       technologies: ['Next.js', 'React', 'SSR', 'Component Library'],
     },
     {
@@ -148,8 +149,44 @@ export default function AboutMe() {
       period: 'January 2025 – April 2025',
       url: '',
       description:
-        'Developed a fully functional hotel management system using React.js, focused on real-time room booking, guest check-in/out, and availability tracking. Utilized TanStack Query (React Query) for efficient data fetching, caching, and synchronization with backend APIs, resulting in improved UI responsiveness and reduced loading times. Designed an intuitive, mobile-friendly UI using Tailwind CSS, ensuring a seamless experience across devices. Integrated RESTful APIs using Axios for managing bookings, guest data, room assignments, and billing. Implemented conditional rendering and optimistic updates using TanStack Query to enhance UX for real-time status updates (e.g., room availability).',
+        'React app for room booking, check-in/out, and availability. TanStack Query, Tailwind CSS, and REST APIs for bookings and billing.',
       technologies: ['React.js', 'TanStack Query', 'Tailwind CSS', 'Axios', 'REST API'],
+    },
+    {
+      name: 'E-commerce Platform',
+      company: 'Personal',
+      period: '2024 – Present',
+      url: 'https://ecom.webstudiomatrix.com/',
+      description:
+        'Full stack e-commerce: Next.js 15, TypeScript, Redux, Tailwind, Docker, CI/CD. Auth, product catalog, cart, and payments (Esewa, Khalti).',
+      technologies: ['Next.js', 'TypeScript', 'Redux', 'Tailwind', 'Docker', 'CI/CD'],
+    },
+    {
+      name: 'Sastobazar',
+      company: 'Personal',
+      period: '2024 – Present',
+      url: '',
+      description:
+        'Backend marketplace: NestJS, TypeORM, PostgreSQL, Redis, Docker. Vendor subscriptions, admin, and reporting.',
+      technologies: ['NestJS', 'TypeORM', 'PostgreSQL', 'Redis', 'Docker'],
+    },
+    {
+      name: 'Messenger (Let\'sChat)',
+      company: 'Personal',
+      period: '2024 – Present',
+      url: '',
+      description:
+        'Real-time chat: Next.js frontend, Node/Express API, Prisma + PostgreSQL, Redis, Socket.io, WebRTC for calls, Docker.',
+      technologies: ['Next.js', 'Express', 'Prisma', 'PostgreSQL', 'Redis', 'Socket.io', 'Docker'],
+    },
+    {
+      name: 'Resume Builder',
+      company: 'Personal',
+      period: '2024 – Present',
+      url: 'https://github.com/Beast-dev1/resumebuilder',
+      description:
+        'MERN stack resume builder: React/Vite client, Express + MongoDB server, JWT auth, AI (OpenAI) enhancements, multiple templates, PDF export.',
+      technologies: ['React', 'Vite', 'Express', 'MongoDB', 'JWT', 'OpenAI'],
     },
   ];
 
@@ -169,7 +206,10 @@ export default function AboutMe() {
       { name: 'Express', icon: 'express' },
       { name: 'Node.js', icon: 'nodejs' },
       { name: 'MongoDB', icon: 'mongodb' },
-      { name: 'NoSQL', icon: 'mongodb' },
+      { name: 'PostgreSQL', icon: 'postgresql' },
+      { name: 'Prisma', icon: 'prisma' },
+      { name: 'Docker', icon: 'docker' },
+      { name: 'CI/CD', icon: 'githubactions' },
     ],
   };
 
@@ -471,13 +511,17 @@ function SkillsTab({ skills }: { skills: Skills }) {
       nodejs: 'nodejs',
       mongodb: 'mongodb',
       jwt: 'jsonwebtoken',
+      postgresql: 'postgresql',
+      prisma: 'prisma',
+      docker: 'docker',
+      githubactions: 'githubactions',
     };
     return iconMap[iconName.toLowerCase()] || iconName.toLowerCase();
   };
   
   const getIconVariant = (iconName: string) => {
     // Determine if icon uses 'plain' or 'original' variant
-    if (iconName === 'tailwindcss' || iconName === 'nextjs') {
+    if (['tailwindcss', 'nextjs', 'postgresql', 'prisma', 'githubactions'].includes(iconName.toLowerCase())) {
       return 'plain';
     }
     return 'original';
@@ -557,22 +601,28 @@ function SkillsTab({ skills }: { skills: Skills }) {
               whileHover={{ scale: 1.05, y: -2 }}
             >
               <div className="w-12 h-12 mb-2 flex items-center justify-center">
-                <Image
-                  src={`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${getTechIcon(skill.icon)}/${getTechIcon(skill.icon)}-${getIconVariant(skill.icon)}.svg`}
-                  alt={skill.name}
-                  width={48}
-                  height={48}
-                  className="w-12 h-12 object-contain"
-                  unoptimized
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const parent = target.parentElement;
-                    if (parent) {
-                      parent.innerHTML = `<div class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded flex items-center justify-center text-xs font-semibold">${skill.name.charAt(0)}</div>`;
-                    }
-                  }}
-                />
+                {skill.icon === 'prisma' ? (
+                  <Icon icon="devicon:prisma" className="w-12 h-12" />
+                ) : skill.icon === 'githubactions' ? (
+                  <Icon icon="simple-icons:githubactions" className="w-12 h-12" />
+                ) : (
+                  <Image
+                    src={`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${getTechIcon(skill.icon)}/${getTechIcon(skill.icon)}-${getIconVariant(skill.icon)}.svg`}
+                    alt={skill.name}
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                    unoptimized
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `<div class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded flex items-center justify-center text-xs font-semibold">${skill.name.charAt(0)}</div>`;
+                      }
+                    }}
+                  />
+                )}
               </div>
               <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">{skill.name}</span>
             </motion.div>
