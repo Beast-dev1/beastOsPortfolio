@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, IconButton } from '@mui/material';
 import { 
   Close, 
@@ -25,10 +25,17 @@ interface ComposeMailProps {
   open: boolean;
   setOpenDrawer: (open: boolean) => void;
   onEmailSent?: () => void;
+  initialTo?: string;
 }
 
-const ComposeMail = ({ open, setOpenDrawer, onEmailSent }: ComposeMailProps) => {
+const ComposeMail = ({ open, setOpenDrawer, onEmailSent, initialTo }: ComposeMailProps) => {
   const [data, setData] = useState<{ to?: string; subject?: string; body?: string }>({});
+
+  useEffect(() => {
+    if (open && initialTo) {
+      setData((prev) => ({ ...prev, to: initialTo }));
+    }
+  }, [open, initialTo]);
   const sentEmailService = useMailApi(API_URLS.saveSentEmails);
   const saveDraftService = useMailApi(API_URLS.saveDraftEmails);
 

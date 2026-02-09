@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Box, styled } from '@mui/material';
 import Header from '../mail/Header';
 import SideBar from '../mail/SideBar';
 import Emails from '../mail/Emails';
 import ViewEmail from '../mail/ViewEmail';
 import SuspenseLoader from '../mail/SuspenseLoader';
+import ComposeMail from '../mail/ComposeMail';
 import { Email } from '@/types/mail';
 
 const Wrapper = styled(Box)`
@@ -21,11 +22,27 @@ const ContentWrapper = styled(Box)`
   overflow: hidden;
 `;
 
+const MAIL_FIRST_VISIT_KEY = 'beastOs_mailFirstVisitDone';
+
 export default function Mail() {
   const [openDrawer, setOpenDrawer] = useState(true);
   const [currentType, setCurrentType] = useState('inbox');
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [showFirstTimeCompose, setShowFirstTimeCompose] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !localStorage.getItem(MAIL_FIRST_VISIT_KEY)) {
+      setShowFirstTimeCompose(true);
+    }
+  }, []);
+
+  const handleFirstTimeComposeClose = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(MAIL_FIRST_VISIT_KEY, 'true');
+    }
+    setShowFirstTimeCompose(false);
+  };
 
   const toggleDrawer = () => {
     setOpenDrawer((prevState) => !prevState);
@@ -50,6 +67,14 @@ export default function Mail() {
 
   return (
     <Wrapper>
+      {showFirstTimeCompose && (
+        <ComposeMail
+          open={true}
+          setOpenDrawer={handleFirstTimeComposeClose}
+          onEmailSent={handleEmailSent}
+          initialTo="prakashrai1900@gmail.com"
+        />
+      )}
       <Header toggleDrawer={toggleDrawer} />
       <ContentWrapper>
         <SideBar
