@@ -17,7 +17,6 @@ import {
   ExternalLink,
   Calendar,
   Award,
-  Globe,
   FileText,
 } from 'lucide-react';
 import { useWindowContext } from '@/Context/windowContext';
@@ -86,6 +85,10 @@ const tabs: Tab[] = [
   { id: 'skills', label: 'Skills', icon: Code },
   { id: 'education', label: 'Education', icon: GraduationCap },
 ];
+
+// Shared glass card style for consistency
+const glassCard =
+  'bg-white/70 dark:bg-[#252525]/80 backdrop-blur-sm rounded-xl border border-gray-200/80 dark:border-white/10';
 
 export default function AboutMe() {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
@@ -232,10 +235,10 @@ export default function AboutMe() {
   };
 
   return (
-    <div className="flex h-full bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white overflow-hidden">
-      {/* Sidebar Navigation */}
-      <div className="w-64 bg-gray-50 dark:bg-[#2d2d2d] border-r border-gray-200 dark:border-[#3a3a3a] flex flex-col">
-        <div className="p-6 border-b border-gray-200 dark:border-[#3a3a3a]">
+    <div className="flex h-full bg-gray-100/80 dark:bg-[#1a1a1a] text-gray-900 dark:text-white overflow-hidden backdrop-blur-[2px]">
+      {/* Sidebar Navigation - Glass */}
+      <div className="w-64 bg-white/70 dark:bg-[#2d2d2d]/80 backdrop-blur-xl border-r border-gray-200/80 dark:border-white/10 flex flex-col rounded-r-xl overflow-hidden">
+        <div className="p-6 border-b border-gray-200/80 dark:border-white/10">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">About Me</h2>
         </div>
         <nav className="flex-1 overflow-y-auto p-2">
@@ -246,15 +249,15 @@ export default function AboutMe() {
               <motion.button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-colors ${
+                className={`w-full flex items-center gap-3 border-l-4 pl-3 pr-4 py-3 rounded-lg mb-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-windows-blue focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1a1a1a] ${
                   isActive
-                    ? 'bg-blue-500 text-white dark:bg-blue-600'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#3a3a3a]'
+                    ? 'bg-windows-blue/15 dark:bg-windows-blue/20 text-windows-blue dark:text-windows-blue-light border-windows-blue'
+                    : 'border-transparent text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10'
                 }`}
-                whileHover={{ x: 2 }}
+                whileHover={isActive ? {} : { x: 2 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-5 h-5 flex-shrink-0" />
                 <span className="text-sm font-medium">{tab.label}</span>
               </motion.button>
             );
@@ -314,47 +317,57 @@ function OverviewTab({
 }) {
   return (
     <div className="p-8 flex flex-col h-full">
-      {/* Hero Section */}
-      <div className="flex flex-col lg:flex-row items-start gap-8 mb-8">
-        <div className="flex-shrink-0">
-          <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-            <User className="w-16 h-16 text-white" />
+      {/* Hero Section - Glass card */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`${glassCard} p-6 mb-6`}
+      >
+        <div className="flex flex-col lg:flex-row items-start gap-8">
+          <div className="flex-shrink-0">
+            <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-windows-blue to-windows-blue-dark flex items-center justify-center shadow-lg ring-2 ring-white/20 dark:ring-white/10">
+              <User className="w-16 h-16 text-white" />
+            </div>
+          </div>
+          <div className="flex-grow min-w-0">
+            <div className="flex flex-wrap items-center gap-3 mb-2">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{personalInfo.name}</h1>
+              <span className="px-3 py-1 bg-windows-blue/10 dark:bg-windows-blue/20 text-windows-blue dark:text-windows-blue-light rounded-full text-sm font-medium">
+                Available for hire
+              </span>
+            </div>
+            <p className="text-xl text-windows-blue dark:text-windows-blue-light font-medium mb-4">{personalInfo.role}</p>
+            {/* Stats as metric pills */}
+            <div className="flex flex-wrap gap-3 mb-4">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100/80 dark:bg-white/5 border border-gray-200/80 dark:border-white/10">
+                <MapPin className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{personalInfo.location}</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100/80 dark:bg-white/5 border border-gray-200/80 dark:border-white/10">
+                <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{personalInfo.yearsOfExperience} years exp.</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100/80 dark:bg-white/5 border border-gray-200/80 dark:border-white/10">
+                <Award className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{personalInfo.projectsCompleted} projects</span>
+              </div>
+            </div>
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base max-w-2xl">{personalInfo.summary}</p>
           </div>
         </div>
-        <div className="flex-grow">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{personalInfo.name}</h1>
-            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium">
-              Available for hire
-            </span>
-          </div>
-          <p className="text-xl text-blue-600 dark:text-blue-400 font-medium mb-4">{personalInfo.role}</p>
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
-            <div className="flex items-center gap-1">
-              <MapPin className="w-4 h-4" />
-              <span>{personalInfo.location}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              <span>{personalInfo.yearsOfExperience} years experience</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Award className="w-4 h-4" />
-              <span>{personalInfo.projectsCompleted} projects completed</span>
-            </div>
-          </div>
-          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{personalInfo.summary}</p>
-        </div>
-      </div>
+      </motion.div>
 
-      {/* Quick Actions - Bottom of page */}
-      <div className="mt-auto pt-8 border-t border-gray-200 dark:border-[#3a3a3a]">
-        <div className="flex gap-3 overflow-x-auto">
+      {/* Summary strip - optional muted background */}
+      <div className="flex-1 min-h-0" />
+
+      {/* Quick Actions - Primary (Download) + Secondary (View, Email, LinkedIn) */}
+      <div className="mt-auto pt-8 border-t border-gray-200/80 dark:border-white/10">
+        <div className="flex flex-wrap gap-3">
           <motion.a
             href={personalInfo.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap border border-gray-300"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-transparent text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10 transition-colors whitespace-nowrap border border-gray-300/80 dark:border-white/20"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -365,7 +378,7 @@ function OverviewTab({
             href="https://mail.google.com/mail/?view=cm&to=prakashrai1900@gmail.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap border border-gray-300"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-transparent text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10 transition-colors whitespace-nowrap border border-gray-300/80 dark:border-white/20"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -374,7 +387,7 @@ function OverviewTab({
           </motion.a>
           <motion.button
             onClick={onViewResume}
-            className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap border border-gray-300"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-transparent text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10 transition-colors whitespace-nowrap border border-gray-300/80 dark:border-white/20"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -383,7 +396,7 @@ function OverviewTab({
           </motion.button>
           <motion.button
             onClick={onDownloadResume}
-            className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap border border-gray-300"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-windows-blue hover:bg-windows-blue-dark dark:bg-windows-blue dark:hover:bg-windows-blue-dark text-white transition-colors whitespace-nowrap border border-windows-blue shadow-sm"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -400,7 +413,10 @@ function OverviewTab({
 function ExperienceTab({ experience }: { experience: Experience[] }) {
   return (
     <div className="p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Work Experience</h2>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <span className="w-1 h-6 rounded-full bg-windows-blue" aria-hidden />
+        Work Experience
+      </h2>
       <div className="space-y-6">
         {experience.map((exp: typeof experience[0], index: number) => (
           <motion.div
@@ -408,12 +424,12 @@ function ExperienceTab({ experience }: { experience: Experience[] }) {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-gray-50 dark:bg-[#2d2d2d] rounded-xl p-6 border-l-4 border-blue-500"
+            className={`${glassCard} p-6 border-l-4 border-windows-blue`}
           >
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{exp.position}</h3>
-                <p className="text-lg text-blue-600 dark:text-blue-400 font-medium">{exp.company}</p>
+                <p className="text-lg text-windows-blue dark:text-windows-blue-light font-medium">{exp.company}</p>
                 <div className="flex items-center gap-2 mt-1 text-sm text-gray-600 dark:text-gray-400">
                   <Calendar className="w-4 h-4" />
                   <span>{exp.period}</span>
@@ -426,7 +442,7 @@ function ExperienceTab({ experience }: { experience: Experience[] }) {
             <ul className="space-y-2 mt-4">
               {exp.responsibilities.map((responsibility: string, idx: number) => (
                 <li key={idx} className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
-                  <span className="text-blue-500 mt-1.5">•</span>
+                  <span className="text-windows-blue mt-1.5 flex-shrink-0">•</span>
                   <span>{responsibility}</span>
                 </li>
               ))}
@@ -442,7 +458,10 @@ function ExperienceTab({ experience }: { experience: Experience[] }) {
 function ProjectsTab({ projects }: { projects: Project[] }) {
   return (
     <div className="p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Featured Projects</h2>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <span className="w-1 h-6 rounded-full bg-windows-blue" aria-hidden />
+        Featured Projects
+      </h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {projects.map((project: typeof projects[0], index: number) => (
           <motion.div
@@ -450,16 +469,17 @@ function ProjectsTab({ projects }: { projects: Project[] }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-gray-50 dark:bg-[#2d2d2d] rounded-xl p-6 border border-gray-200 dark:border-[#3a3a3a] hover:shadow-lg transition-shadow"
+            className={`${glassCard} p-6 hover:shadow-lg hover:border-windows-blue/30 transition-all duration-200`}
+            whileHover={{ y: -2 }}
           >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div className="flex-1 min-w-0">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{project.name}</h3>
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  <Briefcase className="w-4 h-4" />
+                  <Briefcase className="w-4 h-4 flex-shrink-0" />
                   <span>{project.company}</span>
                   <span className="mx-2">•</span>
-                  <Calendar className="w-4 h-4" />
+                  <Calendar className="w-4 h-4 flex-shrink-0" />
                   <span>{project.period}</span>
                 </div>
               </div>
@@ -468,8 +488,10 @@ function ProjectsTab({ projects }: { projects: Project[] }) {
                   href={project.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                  className="flex items-center justify-center w-9 h-9 rounded-lg bg-windows-blue/10 dark:bg-windows-blue/20 text-windows-blue dark:text-windows-blue-light hover:bg-windows-blue/20 dark:hover:bg-windows-blue/30 transition-colors flex-shrink-0"
                   whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label="Open project link"
                 >
                   <ExternalLink className="w-4 h-4" />
                 </motion.a>
@@ -480,7 +502,7 @@ function ProjectsTab({ projects }: { projects: Project[] }) {
               {project.technologies.map((tech: string, techIndex: number) => (
                 <span
                   key={techIndex}
-                  className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium"
+                  className="px-3 py-1 bg-windows-blue/10 dark:bg-windows-blue/20 text-windows-blue dark:text-windows-blue-light rounded-full text-xs font-medium"
                 >
                   {tech}
                 </span>
@@ -529,12 +551,15 @@ function SkillsTab({ skills }: { skills: Skills }) {
 
   return (
     <div className="p-8 space-y-8">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Technical Skills</h2>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <span className="w-1 h-6 rounded-full bg-windows-blue" aria-hidden />
+        Technical Skills
+      </h2>
       
       {/* Frontend Skills */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <Code className="w-5 h-5 text-blue-500" />
+          <span className="w-2 h-2 rounded-full bg-windows-blue" aria-hidden />
           Frontend Technologies
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -544,7 +569,7 @@ function SkillsTab({ skills }: { skills: Skills }) {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.05 }}
-              className="flex flex-col items-center p-4 bg-gray-50 dark:bg-[#2d2d2d] rounded-lg border border-gray-200 dark:border-[#3a3a3a] hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all"
+              className={`${glassCard} flex flex-col items-center p-4 hover:border-blue-400/50 dark:hover:border-windows-blue/50 hover:shadow-md transition-all`}
               whileHover={{ scale: 1.05, y: -2 }}
             >
               <div className="w-12 h-12 mb-2 flex items-center justify-center">
@@ -587,7 +612,7 @@ function SkillsTab({ skills }: { skills: Skills }) {
       {/* Backend Skills */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <Code className="w-5 h-5 text-green-500" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden />
           Backend Technologies
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -597,7 +622,7 @@ function SkillsTab({ skills }: { skills: Skills }) {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: (skills.frontend.length + index) * 0.05 }}
-              className="flex flex-col items-center p-4 bg-gray-50 dark:bg-[#2d2d2d] rounded-lg border border-gray-200 dark:border-[#3a3a3a] hover:border-green-500 dark:hover:border-green-500 hover:shadow-md transition-all"
+              className={`${glassCard} flex flex-col items-center p-4 hover:border-emerald-400/50 dark:hover:border-emerald-500/50 hover:shadow-md transition-all`}
               whileHover={{ scale: 1.05, y: -2 }}
             >
               <div className="w-12 h-12 mb-2 flex items-center justify-center">
@@ -637,7 +662,10 @@ function SkillsTab({ skills }: { skills: Skills }) {
 function EducationTab({ education }: { education: Education[] }) {
   return (
     <div className="p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Education</h2>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <span className="w-1 h-6 rounded-full bg-purple-500" aria-hidden />
+        Education
+      </h2>
       <div className="space-y-6">
         {education.map((edu: typeof education[0], index: number) => (
           <motion.div
@@ -645,20 +673,20 @@ function EducationTab({ education }: { education: Education[] }) {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-gray-50 dark:bg-[#2d2d2d] rounded-xl p-6 border-l-4 border-purple-500"
+            className={`${glassCard} p-6 border-l-4 border-purple-500`}
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center flex-shrink-0 border border-purple-200/50 dark:border-purple-500/30">
                 <GraduationCap className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">{edu.degree}</h3>
                 <p className="text-lg text-gray-700 dark:text-gray-300 font-medium mb-2">{edu.institution}</p>
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <MapPin className="w-4 h-4" />
+                  <MapPin className="w-4 h-4 flex-shrink-0" />
                   <span>{edu.location}</span>
                   <span className="mx-2">•</span>
-                  <Calendar className="w-4 h-4" />
+                  <Calendar className="w-4 h-4 flex-shrink-0" />
                   <span>{edu.year}</span>
                 </div>
               </div>
