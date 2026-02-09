@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Icon } from '@iconify/react';
 import { useWindowContext } from '@/Context/windowContext';
+import { useBattery } from '@/hooks/useBattery';
 import { appConfig } from '@/config/apps';
 import StartMenu from './StartMenu';
 import Terminal from './Terminal';
@@ -40,6 +41,7 @@ export default function Taskbar() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [weatherError, setWeatherError] = useState<string | null>(null);
+  const { level: batteryLevel, charging: batteryCharging, supported: batterySupported } = useBattery();
 
   // Update time every second
   useEffect(() => {
@@ -387,10 +389,17 @@ export default function Taskbar() {
               <Volume2 className="w-4 h-5 text-white" />
             </button>
             <button
-              className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
-              aria-label="Battery"
+              className="w-7 h-7 flex items-center justify-center gap-0.5 rounded-lg hover:bg-[rgba(255,255,255,0.1)] transition-colors duration-200"
+              aria-label={batterySupported && batteryLevel != null ? `Battery ${batteryLevel}%${batteryCharging ? ' (Charging)' : ''}` : 'Battery'}
+              title={batterySupported && batteryLevel != null ? `${batteryLevel}%${batteryCharging ? ' (Charging)' : ''}` : 'Battery'}
             >
-              <Icon icon="gg:battery" className="w-4 h-6 text-white" />
+              <Icon
+                icon={batteryCharging ? 'mdi:battery-charging' : 'gg:battery'}
+                className="w-4 h-6 text-white flex-shrink-0"
+              />
+              {batterySupported && batteryLevel != null && (
+                <span className="text-[10px] text-white font-medium">{batteryLevel}%</span>
+              )}
             </button>
           </div>
 
