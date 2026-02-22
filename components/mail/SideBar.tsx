@@ -1,6 +1,6 @@
 'use client';
 
-import { Drawer } from '@mui/material';
+import { useTheme, useMediaQuery, Drawer } from '@mui/material';
 import SideBarContent from './SideBarContent';
 
 interface SideBarProps {
@@ -12,28 +12,37 @@ interface SideBarProps {
 }
 
 const SideBar = ({ toggleDrawer, openDrawer, currentType, onTypeChange, onEmailSent }: SideBarProps) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const sidebarWidth = openDrawer ? 250 : 72;
+
+  const isTemporary = isMobile;
+  const drawerOpen = isMobile ? openDrawer : true;
 
   return (
     <Drawer
       anchor="left"
-      open={true}
+      open={drawerOpen}
       onClose={toggleDrawer}
-      hideBackdrop={true}
+      hideBackdrop={!isMobile}
+      variant={isTemporary ? 'temporary' : 'persistent'}
       ModalProps={{
         keepMounted: true,
       }}
-      variant="persistent"
       sx={{
+        display: { xs: 'block', md: 'block' },
         '& .MuiDrawer-paper': {
-          width: sidebarWidth,
+          width: isMobile ? 280 : sidebarWidth,
+          maxWidth: isMobile ? '85vw' : 'none',
           borderRight: 'none',
           background: '#f5F5F5',
           left: '0px',
-          marginTop: '100px',
-          height: 'calc(100vh - 64px)',
+          marginTop: isMobile ? 0 : '100px',
+          top: isMobile ? 0 : undefined,
+          height: isMobile ? '100vh' : 'calc(100vh - 64px)',
           transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           overflowX: 'hidden',
+          boxSizing: 'border-box',
         },
       }}
     >
@@ -41,7 +50,9 @@ const SideBar = ({ toggleDrawer, openDrawer, currentType, onTypeChange, onEmailS
         currentType={currentType} 
         onTypeChange={onTypeChange} 
         onEmailSent={onEmailSent}
-        isCollapsed={!openDrawer}
+        isCollapsed={!openDrawer && !isMobile}
+        isMobile={isMobile}
+        onNavigate={isMobile ? toggleDrawer : undefined}
       />
     </Drawer>
   );

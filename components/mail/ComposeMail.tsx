@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Dialog, IconButton } from '@mui/material';
+import { useTheme, useMediaQuery, Dialog, IconButton } from '@mui/material';
 import { 
   Close, 
   DeleteOutline, 
@@ -29,6 +29,8 @@ interface ComposeMailProps {
 }
 
 const ComposeMail = ({ open, setOpenDrawer, onEmailSent, initialTo }: ComposeMailProps) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [data, setData] = useState<{ to?: string; subject?: string; body?: string }>({});
 
   useEffect(() => {
@@ -101,16 +103,18 @@ const ComposeMail = ({ open, setOpenDrawer, onEmailSent, initialTo }: ComposeMai
     <Dialog
       open={open}
       onClose={handleClose}
+      fullScreen={isMobile}
       PaperProps={{
         sx: {
-          height: '600px',
-          width: '600px',
-          maxWidth: '90vw',
-          maxHeight: '90vh',
+          height: { xs: '100%', sm: '600px' },
+          width: { xs: '100%', sm: '600px' },
+          maxWidth: '100vw',
+          maxHeight: { xs: '100vh', sm: '90vh' },
           boxShadow: '0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2)',
-          borderRadius: '8px 8px 0 0',
+          borderRadius: { xs: 0, sm: '8px 8px 0 0' },
           display: 'flex',
           flexDirection: 'column',
+          margin: { xs: 0, sm: 'auto' },
         },
       }}
     >
@@ -131,32 +135,32 @@ const ComposeMail = ({ open, setOpenDrawer, onEmailSent, initialTo }: ComposeMai
       </div>
 
       {/* To and Subject Fields */}
-      <div className="flex flex-col px-4 border-b border-gray-200">
-        <div className="flex items-center border-b border-gray-200 py-2">
-          <span className="text-sm text-[#5F6368] min-w-[60px]">To</span>
+      <div className="flex flex-col px-3 sm:px-4 border-b border-gray-200">
+        <div className="flex flex-wrap items-center border-b border-gray-200 py-2 gap-1">
+          <span className="text-sm text-[#5F6368] min-w-[40px] sm:min-w-[60px]">To</span>
           <input
             type="text"
             placeholder=""
             name="to"
             onChange={onValueChange}
             value={data.to || ''}
-            className="flex-1 bg-transparent border-none outline-none text-sm text-[#202124]"
+            className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm text-[#202124]"
           />
-          <div className="flex items-center gap-2 ml-4">
-            <button className="text-xs text-[#1a73e8] hover:underline">Cc</button>
+          <div className="flex items-center gap-2 ml-0 sm:ml-4 hidden sm:flex">
+            <button type="button" className="text-xs text-[#1a73e8] hover:underline">Cc</button>
             <span className="text-[#5F6368]">|</span>
-            <button className="text-xs text-[#1a73e8] hover:underline">Bcc</button>
+            <button type="button" className="text-xs text-[#1a73e8] hover:underline">Bcc</button>
           </div>
         </div>
         <div className="flex items-center border-b border-gray-200 py-2">
-          <span className="text-sm text-[#5F6368] min-w-[60px]">Subject</span>
+          <span className="text-sm text-[#5F6368] min-w-[40px] sm:min-w-[60px] flex-shrink-0">Subject</span>
           <input
             type="text"
             placeholder=""
             name="subject"
             onChange={onValueChange}
             value={data.subject || ''}
-            className="flex-1 bg-transparent border-none outline-none text-sm text-[#202124]"
+            className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm text-[#202124]"
           />
         </div>
       </div>
@@ -171,16 +175,16 @@ const ComposeMail = ({ open, setOpenDrawer, onEmailSent, initialTo }: ComposeMai
       />
 
       {/* Footer Toolbar */}
-      <div className="flex justify-between items-center py-2.5 px-4 border-t border-gray-200 bg-white">
-        <div className="flex items-center gap-1">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 py-2 sm:py-2.5 px-3 sm:px-4 border-t border-gray-200 bg-white">
+        <div className="flex flex-wrap items-center gap-1 min-w-0">
           <button
             onClick={sendEmail}
-            className="bg-[#0B57D0] text-white font-medium rounded-[24px] px-6 py-2 hover:bg-[#0a4db8] transition-colors flex items-center gap-1"
+            className="bg-[#0B57D0] text-white font-medium rounded-[24px] px-4 sm:px-6 py-1.5 sm:py-2 hover:bg-[#0a4db8] transition-colors flex items-center gap-1 flex-shrink-0"
           >
             Send
             <ArrowDropDown fontSize="small" />
           </button>
-          <div className="flex items-center gap-1 ml-2">
+          <div className="flex items-center gap-0.5 sm:gap-1 ml-0 sm:ml-2 overflow-x-auto max-w-full pb-1 sm:pb-0">
             <IconButton size="small" className="text-[#5F6368] hover:bg-gray-100" title="Formatting options">
               <FormatBold fontSize="small" />
             </IconButton>

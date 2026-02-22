@@ -84,8 +84,8 @@ const Emails = ({ type, openDrawer, onEmailClick, refreshTrigger = 0 }: EmailsPr
   const allSelected = selectedEmails.length === totalEmails && totalEmails > 0;
 
   return (
-    <div className={`w-full transition-all duration-300 ${openDrawer ? 'ml-[250px]' : 'ml-[72px]'}`}>
-      <div className={`pt-3 px-2.5 flex items-center ${hasSelectedEmails ? 'bg-white border-b border-gray-200 sticky -top-2 z-10 shadow-sm' : ''}`}>
+    <div className={`w-full min-w-0 transition-all duration-300 ml-0 ${openDrawer ? 'md:ml-[250px]' : 'md:ml-[72px]'}`}>
+      <div className={`pt-3 px-2 sm:px-2.5 flex items-center flex-wrap gap-0 ${hasSelectedEmails ? 'bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm' : ''}`}>
         <Checkbox 
           size="small" 
           checked={allSelected}
@@ -130,8 +130,8 @@ const Emails = ({ type, openDrawer, onEmailClick, refreshTrigger = 0 }: EmailsPr
             >
               <DeleteOutline fontSize="small" />
             </IconButton>
-            <span className="text-sm text-gray-600 ml-4">
-              {selectedEmails.length} {selectedEmails.length === 1 ? 'selected' : 'selected'}
+            <span className="text-sm text-gray-600 ml-2 md:ml-4">
+              {selectedEmails.length} selected
             </span>
           </>
         )}

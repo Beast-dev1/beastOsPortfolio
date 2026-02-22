@@ -57,7 +57,7 @@ const EmailItem = ({
 
   return (
     <li 
-      className={`group pl-2.5 cursor-pointer flex items-center py-2 transition-colors ${
+      className={`group pl-1.5 sm:pl-2.5 cursor-pointer flex items-center py-2.5 sm:py-2 transition-colors ${
         isSelected 
           ? 'bg-[#e8eef5]' 
           : hasAnySelection 
@@ -116,14 +116,16 @@ const EmailItem = ({
             onEmailClick(email);
           }
         }} 
-        className="flex items-center flex-1 w-full min-w-0"
+        className="flex flex-col sm:flex-row sm:items-center flex-1 w-full min-w-0 gap-0.5 sm:gap-0"
       >
-        <p className="text-sm text-[#5F6368] min-w-[120px] max-w-[200px] truncate">To:{email.to.split('@')[0]}</p>
-        <span className="text-xs bg-[#ddd] text-[#222] rounded px-1.5 py-0.5 mr-2 whitespace-nowrap">Inbox</span>
-        <p className="text-sm text-[#202124] flex-1 min-w-0 truncate">
-          {email.subject || '(No subject)'}
-        </p>
-        <p className="text-xs text-[#5F6368] mr-5 whitespace-nowrap">
+        <div className="flex items-center min-w-0 flex-1 gap-2">
+          <p className="text-sm text-[#5F6368] min-w-0 max-w-[120px] sm:min-w-[120px] sm:max-w-[200px] truncate hidden md:block">To:{email.to.split('@')[0]}</p>
+          <span className="text-xs bg-[#ddd] text-[#222] rounded px-1.5 py-0.5 whitespace-nowrap hidden sm:inline">Inbox</span>
+          <p className="text-sm text-[#202124] flex-1 min-w-0 truncate">
+            {email.subject || '(No subject)'}
+          </p>
+        </div>
+        <p className="text-xs text-[#5F6368] whitespace-nowrap sm:mr-5 flex-shrink-0">
           {emailDate.getDate()}&nbsp;
           {emailDate.toLocaleString('default', { month: 'long' })}
         </p>

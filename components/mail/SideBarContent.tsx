@@ -50,28 +50,36 @@ interface SideBarContentProps {
   onTypeChange: (type: string) => void;
   onEmailSent?: () => void;
   isCollapsed?: boolean;
+  isMobile?: boolean;
+  onNavigate?: () => void;
 }
 
-const SideBarContent = ({ currentType, onTypeChange, onEmailSent, isCollapsed = false }: SideBarContentProps) => {
+const SideBarContent = ({ currentType, onTypeChange, onEmailSent, isCollapsed = false, isMobile, onNavigate }: SideBarContentProps) => {
   const [openDrawer, setOpenDrawer] = useState(false);
+  const expanded = isMobile || !isCollapsed;
 
   const onComposeClick = () => {
     setOpenDrawer(true);
   };
 
+  const handleTypeChange = (name: string) => {
+    onTypeChange(name);
+    if (onNavigate) onNavigate();
+  };
+
   return (
-    <div className={`p-2 mt-0 transition-all duration-300 ${isCollapsed ? 'px-2' : ''}`}>
+    <div className={`p-2 md:mt-0 pt-4 md:pt-2 transition-all duration-300 ${isCollapsed && !isMobile ? 'px-2' : ''}`}>
       <button
         onClick={onComposeClick}
-        className={`bg-[#c2e7ff] text-[#001d35] rounded-2xl py-3.5 flex items-center justify-center hover:bg-[#b0d9f0] transition-all duration-300 ${
-          isCollapsed 
+        className={`bg-[#c2e7ff] text-[#001d35] rounded-2xl py-3 sm:py-3.5 flex items-center justify-center hover:bg-[#b0d9f0] transition-all duration-300 ${
+          isCollapsed && !isMobile
             ? 'px-3 min-w-[48px] w-[48px]' 
             : 'px-4 min-w-[140px]'
         }`}
-        title={isCollapsed ? 'Compose' : ''}
+        title={isCollapsed && !isMobile ? 'Compose' : ''}
       >
-        <CreateOutlined fontSize="small" className={isCollapsed ? '' : 'mr-2.5'} />
-        {!isCollapsed && <span className="whitespace-nowrap">Compose</span>}
+        <CreateOutlined fontSize="small" className={isCollapsed && !isMobile ? '' : 'mr-2.5'} />
+        {expanded && <span className="whitespace-nowrap">Compose</span>}
       </button>
       <ul className={`pt-2.5 text-sm font-medium cursor-pointer`}>
         {SIDEBAR_DATA.map((data) => {
@@ -79,9 +87,9 @@ const SideBarContent = ({ currentType, onTypeChange, onEmailSent, isCollapsed = 
           return (
             <li
               key={data.name}
-              onClick={() => onTypeChange(data.name)}
-              className={`flex items-center py-2 rounded-r-2xl transition-all duration-300 ${
-                isCollapsed 
+              onClick={() => handleTypeChange(data.name)}
+              className={`flex items-center py-2.5 sm:py-2 rounded-r-2xl transition-all duration-300 ${
+                isCollapsed && !isMobile
                   ? 'px-3 justify-center' 
                   : isSelected 
                     ? 'pl-2 pr-3 -ml-2' 
@@ -91,10 +99,10 @@ const SideBarContent = ({ currentType, onTypeChange, onEmailSent, isCollapsed = 
                   ? 'bg-[#d3e3fd]'
                   : 'hover:bg-gray-100'
               }`}
-              title={isCollapsed ? data.title : ''}
+              title={isCollapsed && !isMobile ? data.title : ''}
             >
-              <data.icon fontSize="small" className={isCollapsed ? '' : 'mr-5'} />
-              {!isCollapsed && (
+              <data.icon fontSize="small" className={isCollapsed && !isMobile ? '' : 'mr-5'} />
+              {expanded && (
                 <span className="whitespace-nowrap transition-opacity duration-300 opacity-100">
                   {data.title}
                 </span>

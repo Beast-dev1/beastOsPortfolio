@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { Box, styled } from '@mui/material';
+import { Box, styled, useTheme, useMediaQuery } from '@mui/material';
 import Header from '../mail/Header';
 import SideBar from '../mail/SideBar';
 import Emails from '../mail/Emails';
@@ -20,12 +20,19 @@ const ContentWrapper = styled(Box)`
   display: flex;
   flex: 1;
   overflow: hidden;
+  min-height: 0;
 `;
 
 const MAIL_FIRST_VISIT_KEY = 'beastOs_mailFirstVisitDone';
 
 export default function Mail() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [openDrawer, setOpenDrawer] = useState(true);
+
+  useEffect(() => {
+    if (isMobile) setOpenDrawer(false);
+  }, [isMobile]);
   const [currentType, setCurrentType] = useState('inbox');
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
