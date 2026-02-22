@@ -18,6 +18,8 @@ import {
   Calendar,
   Award,
   FileText,
+  Menu,
+  X,
 } from 'lucide-react';
 import { useWindowContext } from '@/Context/windowContext';
 import { appConfig } from '@/config/apps';
@@ -92,6 +94,7 @@ const glassCard =
 
 export default function AboutMe() {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { addWindow } = useWindowContext();
 
   const personalInfo: PersonalInfo = {
@@ -235,38 +238,77 @@ export default function AboutMe() {
   };
 
   return (
-    <div className="flex h-full bg-gray-100/80 dark:bg-[#1a1a1a] text-gray-900 dark:text-white overflow-hidden backdrop-blur-[2px]">
-      {/* Sidebar Navigation - Glass */}
-      <div className="w-64 bg-white/70 dark:bg-[#2d2d2d]/80 backdrop-blur-xl border-r border-gray-200/80 dark:border-white/10 flex flex-col rounded-r-xl overflow-hidden">
-        <div className="p-6 border-b border-gray-200/80 dark:border-white/10">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">About Me</h2>
-        </div>
-        <nav className="flex-1 overflow-y-auto p-2">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <motion.button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 border-l-4 pl-3 pr-4 py-3 rounded-lg mb-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-windows-blue focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1a1a1a] ${
-                  isActive
-                    ? 'bg-windows-blue/15 dark:bg-windows-blue/20 text-windows-blue dark:text-windows-blue-light border-windows-blue'
-                    : 'border-transparent text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10'
-                }`}
-                whileHover={isActive ? {} : { x: 2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm font-medium">{tab.label}</span>
-              </motion.button>
-            );
-          })}
-        </nav>
+    <div className="flex flex-col h-full bg-gray-100/80 dark:bg-[#1a1a1a] text-gray-900 dark:text-white overflow-hidden backdrop-blur-[2px]">
+      {/* Mobile header bar - hamburger + title */}
+      <div className="flex md:hidden items-center gap-3 px-4 py-3 border-b border-gray-200/80 dark:border-white/10 bg-white/70 dark:bg-[#2d2d2d]/80 backdrop-blur-xl flex-shrink-0">
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+          aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={sidebarOpen}
+        >
+          <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+        </button>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">About Me</h2>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Sidebar Navigation - drawer on mobile, fixed on desktop */}
+        <div
+          className={`absolute md:relative z-20 w-64 h-full bg-white/70 dark:bg-[#2d2d2d]/80 backdrop-blur-xl border-r border-gray-200/80 dark:border-white/10 flex flex-col rounded-r-xl overflow-hidden transition-transform duration-300 ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+          }`}
+        >
+          <div className="p-4 md:p-6 border-b border-gray-200/80 dark:border-white/10 flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">About Me</h2>
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(false)}
+              className="md:hidden p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            </button>
+          </div>
+          <nav className="flex-1 overflow-y-auto p-2">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <motion.button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    setSidebarOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-3 border-l-4 pl-3 pr-4 py-3 rounded-lg mb-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-windows-blue focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1a1a1a] ${
+                    isActive
+                      ? 'bg-windows-blue/15 dark:bg-windows-blue/20 text-windows-blue dark:text-windows-blue-light border-windows-blue'
+                      : 'border-transparent text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10'
+                  }`}
+                  whileHover={isActive ? {} : { x: 2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-sm font-medium">{tab.label}</span>
+                </motion.button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Mobile backdrop */}
+        {sidebarOpen && (
+          <div
+            className="md:hidden fixed inset-0 bg-black/50 z-10"
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden
+          />
+        )}
+
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-y-auto min-w-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -300,6 +342,7 @@ export default function AboutMe() {
             {activeTab === 'education' && <EducationTab education={education} />}
           </motion.div>
         </AnimatePresence>
+        </div>
       </div>
     </div>
   );
@@ -316,7 +359,7 @@ function OverviewTab({
   onViewResume: () => void;
 }) {
   return (
-    <div className="p-8 flex flex-col h-full">
+    <div className="p-4 sm:p-6 md:p-8 flex flex-col h-full">
       {/* Hero Section - Glass card */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -412,7 +455,7 @@ function OverviewTab({
 // Experience Tab Component
 function ExperienceTab({ experience }: { experience: Experience[] }) {
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 sm:p-6 md:p-8 space-y-6">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
         <span className="w-1 h-6 rounded-full bg-windows-blue" aria-hidden />
         Work Experience
@@ -457,7 +500,7 @@ function ExperienceTab({ experience }: { experience: Experience[] }) {
 // Projects Tab Component
 function ProjectsTab({ projects }: { projects: Project[] }) {
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 sm:p-6 md:p-8 space-y-6">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
         <span className="w-1 h-6 rounded-full bg-windows-blue" aria-hidden />
         Featured Projects
@@ -550,7 +593,7 @@ function SkillsTab({ skills }: { skills: Skills }) {
   };
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-4 sm:p-6 md:p-8 space-y-8">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
         <span className="w-1 h-6 rounded-full bg-windows-blue" aria-hidden />
         Technical Skills
@@ -661,7 +704,7 @@ function SkillsTab({ skills }: { skills: Skills }) {
 // Education Tab Component
 function EducationTab({ education }: { education: Education[] }) {
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 sm:p-6 md:p-8 space-y-6">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
         <span className="w-1 h-6 rounded-full bg-purple-500" aria-hidden />
         Education
