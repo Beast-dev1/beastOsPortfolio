@@ -525,7 +525,7 @@ export default function FileExplorer() {
         {/* Mobile Sidebar Toggle */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="md:hidden p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+          className="md:hidden p-2 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors touch-manipulation"
           aria-label="Toggle Sidebar"
         >
           <LayoutGrid className="w-4 h-4" />
@@ -533,7 +533,7 @@ export default function FileExplorer() {
         <button
           onClick={navigateBack}
           disabled={!canGoBack}
-          className={`p-1 md:p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
+          className={`p-2 md:p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors touch-manipulation ${
             !canGoBack ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           aria-label="Back"
@@ -543,7 +543,7 @@ export default function FileExplorer() {
         <button
           onClick={navigateForward}
           disabled={!canGoForward}
-          className={`p-1 md:p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
+          className={`p-2 md:p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors touch-manipulation ${
             !canGoForward ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           aria-label="Forward"
@@ -584,14 +584,14 @@ export default function FileExplorer() {
             className="flex-1 bg-transparent text-sm text-white outline-none px-1"
           />
         </div>
-        <div className="relative flex items-center flex-1 md:flex-none">
-          <Search className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400 absolute left-2 pointer-events-none" />
+        <div className="relative flex items-center flex-1 md:flex-none min-w-0">
+          <Search className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400 absolute left-2 pointer-events-none flex-shrink-0" />
           <input
             type="text"
-            placeholder="Search Home"
+            placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full md:w-48 h-6 md:h-7 pl-7 md:pl-8 pr-2 rounded bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.15)] focus:bg-[rgba(255,255,255,0.15)] border border-transparent focus:border-[rgba(255,255,255,0.2)] text-white placeholder-gray-400 text-xs md:text-sm outline-none transition-all"
+            className="w-full md:w-48 h-8 sm:h-7 pl-7 md:pl-8 pr-2 rounded bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.15)] focus:bg-[rgba(255,255,255,0.15)] border border-transparent focus:border-[rgba(255,255,255,0.2)] text-white placeholder-gray-400 text-sm outline-none transition-all touch-manipulation"
           />
         </div>
       </div>
@@ -635,7 +635,7 @@ export default function FileExplorer() {
         <button
           onClick={handleCopy}
           disabled={selectedItems.size === 0}
-          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
+          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors flex-shrink-0 ${
             selectedItems.size === 0 ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           aria-label="Copy"
@@ -645,7 +645,7 @@ export default function FileExplorer() {
         <button
           onClick={handlePaste}
           disabled={copiedItems.length === 0}
-          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
+          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors flex-shrink-0 ${
             copiedItems.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           aria-label="Paste"
@@ -654,7 +654,7 @@ export default function FileExplorer() {
         </button>
         <button
           disabled={selectedItems.size === 0}
-          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
+          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors flex-shrink-0 ${
             selectedItems.size === 0 ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           aria-label="Rename"
@@ -663,7 +663,7 @@ export default function FileExplorer() {
         </button>
         <button
           disabled={selectedItems.size === 0}
-          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
+          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors flex-shrink-0 hidden sm:flex ${
             selectedItems.size === 0 ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           aria-label="Share"
@@ -673,22 +673,22 @@ export default function FileExplorer() {
         <button
           onClick={handleDelete}
           disabled={selectedItems.size === 0}
-          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
+          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors flex-shrink-0 ${
             selectedItems.size === 0 ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           aria-label="Delete"
         >
           <Trash2 className="w-4 h-4" />
         </button>
-        <div className="w-px h-6 bg-[#3a3a3a] mx-1" />
-        <div className="relative group">
-          <button className="px-3 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors flex items-center gap-1 text-sm">
+        <div className="w-px h-5 sm:h-6 bg-[#3a3a3a] mx-0.5 sm:mx-1 flex-shrink-0" />
+        <div className="relative group flex-shrink-0 hidden sm:block">
+          <button className="px-2 sm:px-3 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors flex items-center gap-1 text-xs sm:text-sm">
             Sort
             <ChevronDown className="w-3 h-3" />
           </button>
         </div>
-        <div className="relative group">
-          <button className="px-3 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors flex items-center gap-1 text-sm">
+        <div className="relative group flex-shrink-0">
+          <button className="px-2 sm:px-3 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors flex items-center gap-1 text-xs sm:text-sm">
             View
             <ChevronDown className="w-3 h-3" />
           </button>
@@ -722,34 +722,36 @@ export default function FileExplorer() {
             </button>
           </div>
         </div>
-        <div className="relative group">
-          <button className="px-3 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors flex items-center gap-1 text-sm">
+        <div className="relative group flex-shrink-0 hidden sm:block">
+          <button className="px-2 sm:px-3 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors flex items-center gap-1 text-xs sm:text-sm">
             Filter
             <ChevronDown className="w-3 h-3" />
           </button>
         </div>
-        <button className="p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ml-auto">
+        <button className="p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors flex-shrink-0 touch-manipulation" aria-label="More">
           <MoreHorizontal className="w-4 h-4" />
         </button>
-        <button className="px-3 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors text-sm">
+        <button className="px-2 sm:px-3 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors text-xs sm:text-sm flex-shrink-0">
           Details
         </button>
+        </div>
       </div>
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Left Navigation Pane */}
-        <div className={`absolute md:relative z-20 w-64 h-full border-r border-[#3a3a3a] dark:border-[#3a3a3a] bg-[#1a1a1a] dark:bg-[#1a1a1a] flex flex-col transition-transform duration-300 ${
+        {/* Left Navigation Pane - overlay on mobile, inline on md+ */}
+        <div className={`absolute md:relative z-20 w-[min(16rem,85vw)] md:w-64 h-full border-r border-[#3a3a3a] dark:border-[#3a3a3a] bg-[#1a1a1a] dark:bg-[#1a1a1a] flex flex-col transition-transform duration-300 shadow-xl md:shadow-none ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}>
           {/* Mobile Close Button */}
-          <div className="md:hidden flex items-center justify-between p-2 border-b border-[#3a3a3a]">
+          <div className="md:hidden flex items-center justify-between p-3 border-b border-[#3a3a3a] flex-shrink-0">
             <span className="text-sm text-white font-medium">Navigation</span>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-1 rounded hover:bg-[rgba(255,255,255,0.1)]"
+              className="p-2 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] touch-manipulation"
+              aria-label="Close sidebar"
             >
-              <X className="w-4 h-4 text-white" />
+              <X className="w-5 h-5 text-white" />
             </button>
           </div>
           <div className="flex-1 overflow-y-auto p-2">
@@ -836,7 +838,7 @@ export default function FileExplorer() {
                       }
                     }
                   }}
-                  className={`w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors group ${
+                  className={`w-full flex items-center gap-2 px-2 py-2.5 sm:py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors group touch-manipulation ${
                     (currentView === 'desktop' && item.id === 'desktop') || 
                     (currentView === 'documents' && item.id === 'documents') ||
                     (currentView === 'pictures' && item.id === 'pictures') ||
@@ -1016,7 +1018,7 @@ export default function FileExplorer() {
                   <span className="text-sm font-semibold text-gray-300">Devices and drives</span>
                 </button>
                 {expandedSections.has('devices') && (
-                  <div className="pl-6 flex flex-wrap gap-6">
+                  <div className="pl-4 sm:pl-6 flex flex-col sm:flex-row sm:flex-wrap gap-4 sm:gap-6">
                     {drives.map((drive) => {
                       const usedGB = drive.totalGB - drive.freeGB;
                       const usedPercent = (usedGB / drive.totalGB) * 100;
@@ -1033,17 +1035,16 @@ export default function FileExplorer() {
                             setNavigationHistory(newHistory);
                             setHistoryIndex(newHistory.length - 1);
                           }}
-                          className="flex items-start gap-3 py-3 px-1 rounded hover:bg-[rgba(255,255,255,0.05)] transition-colors cursor-pointer group"
-                          style={{ minWidth: '280px', flex: '0 1 auto' }}
+                          className="flex items-start gap-3 py-3 px-1 rounded hover:bg-[rgba(255,255,255,0.05)] active:bg-[rgba(255,255,255,0.08)] transition-colors cursor-pointer group touch-manipulation min-w-0 sm:min-w-[280px] sm:flex-[0_1_auto]"
                         >
-                          <div className="flex flex-col items-center flex-shrink-0" style={{ width: '56px' }}>
+                          <div className="flex flex-col items-center flex-shrink-0 w-12 sm:w-14">
                             <div className="relative">
                               <Image
                                 src={drive.icon}
                                 alt={drive.name}
                                 width={48}
                                 height={48}
-                                className="w-12 h-12 object-contain"
+                                className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
                                 unoptimized
                               />
                               {drive.hasWindowsLogo && (
@@ -1054,8 +1055,8 @@ export default function FileExplorer() {
                             </div>
                             <div className="w-2 h-2 bg-green-500 rounded-full border border-[#1a1a1a] mt-0.5"></div>
                           </div>
-                          <div className="flex-1 min-w-0" style={{ minWidth: '200px' }}>
-                            <div className="text-sm font-medium text-gray-200 mb-2">{drive.name}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-gray-200 mb-2 truncate">{drive.name}</div>
                             <div className="w-full h-2 bg-[rgba(255,255,255,0.1)] rounded-full overflow-hidden mb-1.5">
                               <div
                                 className="h-full bg-[#0078D4] transition-all duration-300"
@@ -1076,32 +1077,26 @@ export default function FileExplorer() {
           ) : currentView === 'drive' ? (
             <div className="p-2 md:p-4">
               {/* Drive contents in details view */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <div className="overflow-x-auto -mx-2 sm:mx-0">
+                <table className="w-full min-w-[320px]">
                   <thead>
                     <tr className="border-b border-[#3a3a3a]">
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] whitespace-nowrap">
                         <div className="flex items-center gap-1">
                           Name
                           <ChevronUp className="w-3 h-3" />
                         </div>
                       </th>
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
-                        Date modified
-                      </th>
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
-                        Type
-                      </th>
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
-                        Size
-                      </th>
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] whitespace-nowrap hidden sm:table-cell">Date modified</th>
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] whitespace-nowrap hidden md:table-cell">Type</th>
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] whitespace-nowrap hidden lg:table-cell">Size</th>
                     </tr>
                   </thead>
                   <tbody>
                     {getDriveContents(currentDirectory?.replace('drive-', '') || 'c').map((item, index) => (
                       <tr
                         key={index}
-                        className="hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
+                        className="hover:bg-[rgba(255,255,255,0.05)] active:bg-[rgba(255,255,255,0.08)] cursor-pointer touch-manipulation"
                         onClick={() => {
                           if (item.type === 'Application' && item.id) {
                             // Launch application
@@ -1137,7 +1132,7 @@ export default function FileExplorer() {
                           }
                         }}
                       >
-                        <td className="py-2 px-4 flex items-center gap-2">
+                        <td className="py-2 px-2 sm:px-4 flex items-center gap-2 min-w-0">
                           {item.type === 'File folder' ? (
                             <Image
                               src="/icons/folder/folder.png"
@@ -1159,11 +1154,11 @@ export default function FileExplorer() {
                           ) : (
                             <FileText className="w-4 h-4 text-gray-400" />
                           )}
-                          <span className="text-sm text-gray-300">{item.name}</span>
+                          <span className="text-sm text-gray-300 truncate">{item.name}</span>
                         </td>
-                        <td className="py-2 px-4 text-sm text-gray-400">{item.dateModified}</td>
-                        <td className="py-2 px-4 text-sm text-gray-400">{item.type}</td>
-                        <td className="py-2 px-4 text-sm text-gray-400">{item.size}</td>
+                        <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden sm:table-cell whitespace-nowrap">{item.dateModified}</td>
+                        <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden md:table-cell">{item.type}</td>
+                        <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden lg:table-cell">{item.size}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1173,32 +1168,21 @@ export default function FileExplorer() {
           ) : currentView === 'desktop' ? (
             <div className="p-2 md:p-4">
               {/* Desktop applications in details view */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <div className="overflow-x-auto -mx-2 sm:mx-0">
+                <table className="w-full min-w-[320px]">
                   <thead>
                     <tr className="border-b border-[#3a3a3a]">
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
-                        <div className="flex items-center gap-1">
-                          Name
-                          <ChevronUp className="w-3 h-3" />
-                        </div>
-                      </th>
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
-                        Date modified
-                      </th>
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
-                        Type
-                      </th>
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
-                        Size
-                      </th>
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] whitespace-nowrap">Name</th>
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] whitespace-nowrap hidden sm:table-cell">Date modified</th>
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] hidden md:table-cell">Type</th>
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] hidden lg:table-cell">Size</th>
                     </tr>
                   </thead>
                   <tbody>
                     {getDesktopApplications().map((item, index) => (
                       <tr
                         key={index}
-                        className="hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
+                        className="hover:bg-[rgba(255,255,255,0.05)] active:bg-[rgba(255,255,255,0.08)] cursor-pointer touch-manipulation"
                         onClick={() => {
                           if (item.type === 'Application' && item.id) {
                             // Launch application
@@ -1234,7 +1218,7 @@ export default function FileExplorer() {
                           }
                         }}
                       >
-                        <td className="py-2 px-4 flex items-center gap-2">
+                        <td className="py-2 px-2 sm:px-4 flex items-center gap-2 min-w-0">
                           {item.type === 'Application' && item.icon ? (
                             <Image
                               src={item.icon}
@@ -1247,11 +1231,11 @@ export default function FileExplorer() {
                           ) : (
                             <FileText className="w-4 h-4 text-gray-400" />
                           )}
-                          <span className="text-sm text-gray-300">{item.name}</span>
+                          <span className="text-sm text-gray-300 truncate">{item.name}</span>
                         </td>
-                        <td className="py-2 px-4 text-sm text-gray-400">{item.dateModified}</td>
-                        <td className="py-2 px-4 text-sm text-gray-400">{item.type}</td>
-                        <td className="py-2 px-4 text-sm text-gray-400">{item.size}</td>
+                        <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden sm:table-cell whitespace-nowrap">{item.dateModified}</td>
+                        <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden md:table-cell">{item.type}</td>
+                        <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden lg:table-cell">{item.size}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1261,32 +1245,21 @@ export default function FileExplorer() {
           ) : currentView === 'documents' ? (
             <div className="p-2 md:p-4">
               {/* Documents folder contents in details view */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <div className="overflow-x-auto -mx-2 sm:mx-0">
+                <table className="w-full min-w-[280px]">
                   <thead>
                     <tr className="border-b border-[#3a3a3a]">
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
-                        <div className="flex items-center gap-1">
-                          Name
-                          <ChevronUp className="w-3 h-3" />
-                        </div>
-                      </th>
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
-                        Date modified
-                      </th>
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
-                        Type
-                      </th>
-                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)]">
-                        Size
-                      </th>
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] whitespace-nowrap">Name</th>
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] whitespace-nowrap hidden sm:table-cell">Date modified</th>
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] hidden md:table-cell">Type</th>
+                      <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 cursor-pointer hover:bg-[rgba(255,255,255,0.05)] hidden lg:table-cell">Size</th>
                     </tr>
                   </thead>
                   <tbody>
                     {getDocumentsContents().map((item, index) => (
                       <tr
                         key={index}
-                        className="hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
+                        className="hover:bg-[rgba(255,255,255,0.05)] active:bg-[rgba(255,255,255,0.08)] cursor-pointer touch-manipulation"
                         onClick={() => {
                           // Open PDF in Chrome browser
                           const chromeApp = appConfig.taskbarApps.find((app) => app.id === 'GoogleChrome');
@@ -1301,7 +1274,7 @@ export default function FileExplorer() {
                           }
                         }}
                       >
-                        <td className="py-2 px-4 flex items-center gap-2">
+                        <td className="py-2 px-2 sm:px-4 flex items-center gap-2 min-w-0">
                           {item.icon ? (
                             <Image
                               src={item.icon}
@@ -1314,11 +1287,11 @@ export default function FileExplorer() {
                           ) : (
                             <FileText className="w-4 h-4 text-gray-400" />
                           )}
-                          <span className="text-sm text-gray-300">{item.name}</span>
+                          <span className="text-sm text-gray-300 truncate">{item.name}</span>
                         </td>
-                        <td className="py-2 px-4 text-sm text-gray-400">{item.dateModified}</td>
-                        <td className="py-2 px-4 text-sm text-gray-400">{item.type}</td>
-                        <td className="py-2 px-4 text-sm text-gray-400">{item.size}</td>
+                        <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden sm:table-cell whitespace-nowrap">{item.dateModified}</td>
+                        <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden md:table-cell">{item.type}</td>
+                        <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden lg:table-cell">{item.size}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1347,16 +1320,16 @@ export default function FileExplorer() {
                     <button
                       key={item.id}
                       onClick={() => handleQuickAccessClick(item)}
-                      className="flex flex-col items-center gap-1 p-2 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors group"
+                      className="flex flex-col items-center gap-1 p-2 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors group touch-manipulation"
                     >
-                      <div className="w-16 h-16 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center overflow-hidden border border-[rgba(255,255,255,0.1)]">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center overflow-hidden border border-[rgba(255,255,255,0.1)]">
                         {item.type === 'app' ? (
                           <Image
                             src={item.icon}
                             alt={item.name}
                             width={40}
                             height={40}
-                            className="w-10 h-10 object-contain"
+                            className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
                             unoptimized
                           />
                         ) : item.type === 'drive' ? (
@@ -1365,7 +1338,7 @@ export default function FileExplorer() {
                             alt={item.name}
                             width={32}
                             height={32}
-                            className="w-8 h-8 object-contain"
+                            className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
                             unoptimized
                           />
                         ) : (
@@ -1374,13 +1347,13 @@ export default function FileExplorer() {
                             alt={item.name}
                             width={32}
                             height={32}
-                            className="w-8 h-8 object-contain"
+                            className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
                             unoptimized
                           />
                         )}
                       </div>
-                      <div className="text-center">
-                        <div className="text-xs text-gray-300 group-hover:text-white transition-colors truncate w-full">
+                      <div className="text-center min-w-0 w-full">
+                        <div className="text-[10px] sm:text-xs text-gray-300 group-hover:text-white transition-colors truncate w-full">
                           {item.name}
                         </div>
                         {item.location && (
@@ -1393,63 +1366,61 @@ export default function FileExplorer() {
               </div>
 
               {/* Tabs */}
-              <div className="flex items-center gap-1 border-b border-[#3a3a3a] mb-4">
+              <div className="flex items-center gap-0.5 sm:gap-1 border-b border-[#3a3a3a] mb-4 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab('recent')}
-                  className={`px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${
+                  className={`px-3 sm:px-4 py-2.5 sm:py-2 text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 sm:gap-2 flex-shrink-0 touch-manipulation ${
                     activeTab === 'recent'
                       ? 'text-white border-b-2 border-[#0078D4]'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
-                  <Clock className="w-4 h-4" />
+                  <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   Recent
                 </button>
                 <button
                   onClick={() => setActiveTab('favorites')}
-                  className={`px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${
+                  className={`px-3 sm:px-4 py-2.5 sm:py-2 text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 sm:gap-2 flex-shrink-0 touch-manipulation ${
                     activeTab === 'favorites'
                       ? 'text-white border-b-2 border-[#0078D4]'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
-                  <Star className="w-4 h-4" />
+                  <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   Favorites
                 </button>
                 <button
                   onClick={() => setActiveTab('shared')}
-                  className={`px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${
+                  className={`px-3 sm:px-4 py-2.5 sm:py-2 text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 sm:gap-2 flex-shrink-0 touch-manipulation ${
                     activeTab === 'shared'
                       ? 'text-white border-b-2 border-[#0078D4]'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
-                  <Users className="w-4 h-4" />
+                  <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   Shared
                 </button>
               </div>
 
               {/* Recent Files List */}
               {activeTab === 'recent' && (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
+                <div className="overflow-x-auto -mx-2 sm:mx-0">
+                  <table className="w-full min-w-[280px]">
                     <thead>
                       <tr className="border-b border-[#3a3a3a]">
-                        <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Name</th>
-                        <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">
-                          Date accessed
-                        </th>
-                        <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Activity</th>
+                        <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 whitespace-nowrap">Name</th>
+                        <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 whitespace-nowrap hidden sm:table-cell">Date accessed</th>
+                        <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 hidden md:table-cell">Activity</th>
                       </tr>
                     </thead>
                     <tbody>
                       {recentFiles.slice(0, 10).map((file) => (
                         <tr
                           key={file.id}
-                          className="border-b border-[#3a3a3a] hover:bg-[rgba(255,255,255,0.05)] cursor-pointer"
+                          className="border-b border-[#3a3a3a] hover:bg-[rgba(255,255,255,0.05)] active:bg-[rgba(255,255,255,0.08)] cursor-pointer touch-manipulation"
                           onClick={() => handleFileClick(file)}
                         >
-                          <td className="py-2 px-4 flex items-center gap-2">
+                          <td className="py-2 px-2 sm:px-4 flex items-center gap-2 min-w-0">
                             {file.type === 'folder' ? (
                               <Image
                                 src="/icons/folder/folder.png"
@@ -1462,12 +1433,12 @@ export default function FileExplorer() {
                             ) : (
                               <FileText className="w-4 h-4 text-gray-400" />
                             )}
-                            <span className="text-sm text-gray-300">{file.name}</span>
+                            <span className="text-sm text-gray-300 truncate">{file.name}</span>
                           </td>
-                          <td className="py-2 px-4 text-sm text-gray-400">
+                          <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden sm:table-cell whitespace-nowrap">
                             {new Date(file.lastAccessed).toLocaleString()}
                           </td>
-                          <td className="py-2 px-4 text-sm text-gray-400">-</td>
+                          <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden md:table-cell">-</td>
                         </tr>
                       ))}
                       {recentFiles.length === 0 && (
@@ -1494,7 +1465,7 @@ export default function FileExplorer() {
             <div className="p-2 md:p-4">
               {/* File List View */}
               {viewMode === 'grid' && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1.5 sm:gap-2 md:gap-4">
                   {filteredFiles.map((file) => (
                     <button
                       key={file.id}
@@ -1524,27 +1495,27 @@ export default function FileExplorer() {
                         e.preventDefault();
                         setSelectedItems(new Set([file.id]));
                       }}
-                      className={`flex flex-col items-center gap-2 p-3 rounded transition-colors ${
+                      className={`flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-3 rounded transition-colors touch-manipulation active:bg-[rgba(255,255,255,0.15)] ${
                         selectedItems.has(file.id)
                           ? 'bg-[rgba(0,120,212,0.2)]'
                           : 'hover:bg-[rgba(255,255,255,0.1)]'
                       }`}
                     >
-                      <div className="w-16 h-16 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center overflow-hidden border border-[rgba(255,255,255,0.1)]">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-[rgba(255,255,255,0.05)] flex items-center justify-center overflow-hidden border border-[rgba(255,255,255,0.1)] flex-shrink-0">
                         {file.type === 'folder' ? (
                           <Image
                             src="/icons/folder/folder.png"
                             alt={file.name}
                             width={32}
                             height={32}
-                            className="w-8 h-8 object-contain"
+                            className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
                             unoptimized
                           />
                         ) : (
-                          <FileText className="w-8 h-8 text-gray-400" />
+                          <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                         )}
                       </div>
-                      <span className="text-xs text-gray-300 text-center truncate w-full">
+                      <span className="text-[10px] sm:text-xs text-gray-300 text-center truncate w-full">
                         {file.name}
                       </span>
                     </button>
@@ -1571,7 +1542,7 @@ export default function FileExplorer() {
                           handleFileClick(file);
                         }
                       }}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded transition-colors ${
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 sm:py-2 rounded transition-colors touch-manipulation active:bg-[rgba(255,255,255,0.15)] ${
                         selectedItems.has(file.id)
                           ? 'bg-[rgba(0,120,212,0.2)]'
                           : 'hover:bg-[rgba(255,255,255,0.1)]'
@@ -1589,7 +1560,7 @@ export default function FileExplorer() {
                       ) : (
                         <FileText className="w-5 h-5 text-gray-400" />
                       )}
-                      <span className="text-sm text-gray-300">{file.name}</span>
+                      <span className="text-sm text-gray-300 truncate min-w-0">{file.name}</span>
                     </button>
                   ))}
                 </div>
@@ -1598,20 +1569,23 @@ export default function FileExplorer() {
               {viewMode === 'details' && (
                 <>
                   {filteredFiles.length > 0 ? (
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
+                    <div className="overflow-x-auto -mx-2 sm:mx-0">
+                      <table className="w-full min-w-[280px]">
                         <thead>
                           <tr className="border-b border-[#3a3a3a]">
-                            <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Name</th>
-                            <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Date modified</th>
-                            <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Type</th>
-                            <th className="text-left py-2 px-4 text-xs font-semibold text-gray-400">Size</th>
+                            <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 whitespace-nowrap">Name</th>
+                            <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 whitespace-nowrap hidden sm:table-cell">Date modified</th>
+                            <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 hidden md:table-cell">Type</th>
+                            <th className="text-left py-2 px-2 sm:px-4 text-xs font-semibold text-gray-400 hidden lg:table-cell">Size</th>
                           </tr>
                         </thead>
                         <tbody>
                           {filteredFiles.map((file) => (
                             <tr
                               key={file.id}
+                              className={`border-b border-[#3a3a3a] hover:bg-[rgba(255,255,255,0.05)] active:bg-[rgba(255,255,255,0.08)] cursor-pointer touch-manipulation ${
+                                selectedItems.has(file.id) ? 'bg-[rgba(0,120,212,0.2)]' : ''
+                              }`}
                               onClick={(e) => {
                                 if (e.ctrlKey || e.metaKey) {
                                   const newSelected = new Set(selectedItems);
@@ -1626,11 +1600,8 @@ export default function FileExplorer() {
                                   handleFileClick(file);
                                 }
                               }}
-                              className={`border-b border-[#3a3a3a] hover:bg-[rgba(255,255,255,0.05)] cursor-pointer ${
-                                selectedItems.has(file.id) ? 'bg-[rgba(0,120,212,0.2)]' : ''
-                              }`}
                             >
-                              <td className="py-2 px-4 flex items-center gap-2">
+                              <td className="py-2 px-2 sm:px-4 flex items-center gap-2 min-w-0">
                                 {file.type === 'folder' ? (
                                   <Image
                                     src="/icons/folder/folder.png"
@@ -1643,15 +1614,15 @@ export default function FileExplorer() {
                                 ) : (
                                   <FileText className="w-4 h-4 text-gray-400" />
                                 )}
-                                <span className="text-sm text-gray-300">{file.name}</span>
+                                <span className="text-sm text-gray-300 truncate">{file.name}</span>
                               </td>
-                              <td className="py-2 px-4 text-sm text-gray-400">
+                              <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden sm:table-cell whitespace-nowrap">
                                 {new Date(file.lastAccessed).toLocaleString()}
                               </td>
-                              <td className="py-2 px-4 text-sm text-gray-400">
+                              <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden md:table-cell">
                                 {file.type === 'folder' ? 'File folder' : 'File'}
                               </td>
-                              <td className="py-2 px-4 text-sm text-gray-400">-</td>
+                              <td className="py-2 px-2 sm:px-4 text-sm text-gray-400 hidden lg:table-cell">-</td>
                             </tr>
                           ))}
                         </tbody>
