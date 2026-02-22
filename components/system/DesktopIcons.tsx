@@ -228,8 +228,16 @@ export default function DesktopIcons() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[1]" style={{ paddingBottom: '48px' }}>
-      <div className="absolute inset-0 pointer-events-none">
+    <div
+      className="fixed inset-0 z-[1]"
+      style={{
+        paddingBottom: '48px',
+        paddingLeft: 'env(safe-area-inset-left, 0)',
+        paddingRight: 'env(safe-area-inset-right, 0)',
+        paddingTop: 'env(safe-area-inset-top, 0)',
+      }}
+    >
+      <div className="absolute inset-0 pointer-events-none" style={{ paddingLeft: 'env(safe-area-inset-left, 0)', paddingTop: 'env(safe-area-inset-top, 0)' }}>
         {desktopIcons.map((icon, index) => {
           const position = iconPositions.get(icon.id) || getPositionForIcon(icon.id, index);
           

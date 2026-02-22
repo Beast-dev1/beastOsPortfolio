@@ -42,16 +42,16 @@ export default React.memo(function DesktopIconItem({
     bottom: typeof window !== 'undefined' ? window.innerHeight - 140 : 800,
   });
   
-  // Update constraints on window resize
+  // Update constraints on window resize (match useDesktopIcons breakpoint & grid)
   useEffect(() => {
     const updateConstraints = () => {
       const isMobile = window.innerWidth < 768;
-      dragConstraints.current = {
-        left: isMobile ? 10 : 20,
-        top: isMobile ? 10 : 20,
-        right: window.innerWidth - (isMobile ? 90 : 100),
-        bottom: window.innerHeight - 140,
-      };
+      // Mobile: smaller insets and account for 64px icon + taskbar ~56px
+      const left = isMobile ? 8 : 20;
+      const top = isMobile ? 12 : 20;
+      const right = window.innerWidth - (isMobile ? 72 : 100); // icon width + margin
+      const bottom = window.innerHeight - (isMobile ? 104 : 140); // taskbar + padding
+      dragConstraints.current = { left, top, right, bottom };
     };
     
     window.addEventListener('resize', updateConstraints);
