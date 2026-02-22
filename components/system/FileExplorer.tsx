@@ -596,10 +596,11 @@ export default function FileExplorer() {
         </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex items-center gap-1 px-2 py-1 border-b border-[#3a3a3a] dark:border-[#3a3a3a] bg-[#252525] dark:bg-[#252525]">
-        <div className="relative group">
-          <button className="px-3 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors flex items-center gap-1 text-sm">
+      {/* Toolbar - scroll horizontally on mobile */}
+      <div className="flex items-center gap-0.5 sm:gap-1 px-2 py-1 border-b border-[#3a3a3a] dark:border-[#3a3a3a] bg-[#252525] dark:bg-[#252525] overflow-x-auto overflow-y-hidden min-h-[40px] touch-manipulation">
+        <div className="flex items-center flex-nowrap gap-0.5 sm:gap-1">
+        <div className="relative group flex-shrink-0">
+          <button className="px-2 sm:px-3 py-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors flex items-center gap-1 text-xs sm:text-sm">
             New
             <ChevronDown className="w-3 h-3" />
           </button>
@@ -620,11 +621,11 @@ export default function FileExplorer() {
             </button>
           </div>
         </div>
-        <div className="w-px h-6 bg-[#3a3a3a] mx-1" />
+        <div className="w-px h-5 sm:h-6 bg-[#3a3a3a] mx-0.5 sm:mx-1 flex-shrink-0" />
         <button
           onClick={handleCut}
           disabled={selectedItems.size === 0}
-          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors ${
+          className={`p-1.5 rounded hover:bg-[rgba(255,255,255,0.1)] active:bg-[rgba(255,255,255,0.15)] transition-colors flex-shrink-0 touch-manipulation ${
             selectedItems.size === 0 ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           aria-label="Cut"
